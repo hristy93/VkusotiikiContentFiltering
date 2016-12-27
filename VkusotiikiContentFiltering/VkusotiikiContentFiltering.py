@@ -9,7 +9,6 @@ import random
 
 # -*- coding: utf-8 -*-
 # for first use - install (in this order) numpy, scipy, sklearn !!!
-
 """ Enables the unicode console for windows """
 def enable_win_unicode_console():
     try:
@@ -42,7 +41,7 @@ def get_tf_data(ingredient_data, ingredients_count):
     for ingredient_inner_data in ingredient_data.values():
         tf_inner_data = []
         for item in ingredient_inner_data:
-            tf_inner_data.append(item/math.sqrt(ingredients_count))
+            tf_inner_data.append(item / math.sqrt(ingredients_count))
         tf_data.append(tf_inner_data)
     print("tf_data count: " + str(len(tf_data)))
     return tf_data
@@ -52,7 +51,7 @@ def get_tf_data(ingredient_data, ingredients_count):
 def get_idf_data(ingredients_count_info, data_count):
     idf_data = []
     for item in ingredients_count_info.values():
-        idf_data.append(math.log10((1 + data_count)/(item + 1)))
+        idf_data.append(math.log10((1 + data_count) / (item + 1)))
     print("idf_data count: " + str(len(idf_data)))
     return idf_data
 
@@ -117,15 +116,16 @@ def generate_user_profile(tf_data, ingredients_count, user_likes):
 
 
 """ Generates the user preferences for the recipe using a dot product
-    of user_profile, idf_data ann tf_data
+    of user_profile, idf_data and tf_data
 """
 def generate_user_pref(data_count, tf_data, idf_data, user_profile):
     user_pref = []
     for i in range(data_count):
         tf_list = tf_data[i]
-        user_pref_value = round(sum(p*q*t for p, q, t in zip(user_profile, idf_data, tf_list)), 2)
+        user_pref_value = round(sum(p * q * t for p, q, t in zip(user_profile, idf_data, tf_list)), 2)
         user_pref.append(user_pref_value)
-    print("user_pref count: " + str(len(user_pref)))
+    #print("user_pref: " + str(len(user_pref)))
+    #print("user_pref_data count: " + str(len(user_pref_data)))
     return user_pref
 
 
@@ -135,15 +135,18 @@ def get_n_largest_user_pref(best_user_pref_count, user_pref, user_likes):
     modified_user_pref = {index : item for index, item in enumerate(user_pref) if user_likes[user_pref.index(item)] == 0}
     n_largest_user_pref_indexes = nlargest(best_user_pref_count, modified_user_pref, key=modified_user_pref.get)
     n_largest_user_pref = {index : modified_user_pref[index] for index in n_largest_user_pref_indexes}
+    print("The n largest user pref for the unliked recipes for a user:")
     print("n_largest_user_pref_indexes: " + str(n_largest_user_pref_indexes))
     print("n_largest_user_pref: " + str(n_largest_user_pref))
     return (n_largest_user_pref_indexes, n_largest_user_pref)
 
-    ## not working when there is more that one percent (item) with 
+    ## not working when there is more that one percent (item) with
     ## the same value and it gets the same index
     #n_largest_user_pref = dict()
-    ##modified_user_pref = {item : user_pref[index] for index, item in enumerate(user_pref) if user_likes[user_pref.index(item)] == 0}
-    ##sorted_user_pref = sorted(sorted_user_pref.items(), key=lambda x: x[1], reverse=True)
+    ##modified_user_pref = {item : user_pref[index] for index, item in
+    ##enumerate(user_pref) if user_likes[user_pref.index(item)] == 0}
+    ##sorted_user_pref = sorted(sorted_user_pref.items(), key=lambda x: x[1],
+    ##reverse=True)
     ##user_pref.sort(key = None, reverse = True)
     ##print(user_pref)
     #n_largest_count = 0
@@ -168,12 +171,38 @@ def filter_data_by_category(recipe_category_id, data):
 
 """ Gets the n (best_recipe_count) closest recipes to the best prefered recipe with a given best_recipe_pref_index """
 def n_closest_recipes_to_best_recipe_pref(best_recipe_count, tf_data, best_recipe_pref_index):
-    pass    
+    recipes_diff = dict()
+    n_closest_recipe_indexes = []
+    best_recipe_pref_tf_values = tf_data[best_recipe_pref_index]
+    index = 0
+    for tf_values in tf_data:
+        if tf_values != best_recipe_pref_tf_values:
+            recipes_diff[index] = np.dot(tf_values, best_recipe_pref_tf_values)
+            index += 1
+    n_closest_recipe_indexes = nlargest(best_recipe_count, recipes_diff, key=recipes_diff.get)
+    n_closest_recipes = {index : recipes_diff[index] for index in n_closest_recipe_indexes}
+    #print("recipes_diff: " + str(recipes_diff))
+    print("The closest recipes to the recipe with the largest user pref:")
+    print("n_closest_recipes: " + str(n_closest_recipes))
+    print("n_closest_recipe_indexes: " + str(n_closest_recipe_indexes))
+    return n_closest_recipe_indexes
 
 
 """ Gets the n (best_user_pref_count) closest users to an user with a given user_pref """
 def n_closest_users_to_user_pref(best_user_pref_count, user_pref_data, user_pref):
-    pass
+    users_diff = dict()
+    n_closest_user_indexes = []
+    index = 0
+    for user_pref_values in user_pref_data:
+        if user_pref_values != user_pref:
+            users_diff[index] = np.dot(user_pref_values, user_pref)
+            index += 1
+    n_closest_user_indexes = nlargest(best_user_pref_count, users_diff, key=users_diff.get)
+    n_closest_users = {index : users_diff[index] for index in n_closest_user_indexes}
+    print("The closest users to the user with the largest user pref:")
+    print("n_closest_users: " + str(n_closest_users))
+    print("n_closest_user_indexes: " + str(n_closest_user_indexes))
+    return n_closest_user_indexes
     
 
 """ Tests the kNN methods of sklearn module """
@@ -201,6 +230,7 @@ if __name__ == "__main__":
     #recipe_category_id = 1
     #filter_data_by_category(recipe_category_id, data)
     data_count = len(data)
+    users_count = 20
     best_user_pref_count = 5
     best_recipe_count = 5
     recipe_category = ""
@@ -211,6 +241,8 @@ if __name__ == "__main__":
     ingredients = get_ingredients(data)
     ingredients = list(ingredients)
     ingredients_count = len(ingredients)
+    n_closest_recipes = []
+    n_closest_users = []
 
     process_data(data, ingredients, ingredient_data, ingredients_count_info)
     idf_data = get_idf_data(ingredients_count_info, data_count)
@@ -218,7 +250,11 @@ if __name__ == "__main__":
     user_likes = generate_user_likes(data_count)
     user_profile = generate_user_profile(tf_data, ingredients_count, user_likes)
     user_pref = generate_user_pref(data_count, tf_data, idf_data, user_profile)
+    best_user_pref = max(user_pref)
+    best_recipe_pref_index = user_pref.index(best_user_pref)
     n_largest_user_pref_indexes, n_largest_user_pref = get_n_largest_user_pref(best_user_pref_count, user_pref, user_likes)
+    n_closest_recipes = n_closest_recipes_to_best_recipe_pref(best_recipe_count, tf_data, best_recipe_pref_index)
+    #n_closest_users = n_closest_users_to_user_pref(best_user_pref_count, user_pref_data, user_pref)
 
     # sklearn_tests
     #test_kmeans(tf_data, best_user_pref_count)
