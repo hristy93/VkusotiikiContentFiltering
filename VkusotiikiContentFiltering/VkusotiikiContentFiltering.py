@@ -1,13 +1,16 @@
+# -*- coding: utf-8 -*-
 import json
 import sys
 import math
+import difflib
 from heapq import nlargest
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.neighbors import NearestNeighbors
+from sklearn.feature_extraction.text import TfidfTransformer
 import random
 
-# -*- coding: utf-8 -*-
+
 # for first use - install (in this order) numpy, scipy, sklearn !!!
 """ Enables the unicode console for windows """
 def enable_win_unicode_console():
@@ -21,27 +24,33 @@ def enable_win_unicode_console():
 
 
 """ Reads the json data and saves it in data """
-def read_json():
+def read_json(json_file_name):
     data = []
-    with open('recipes_422_refined.json', 'r', encoding="utf-8") as json_data:
+    with open(json_file_name, 'r', encoding="utf-8") as json_data:
         data = json.load(json_data)
     return data
 
 """ Generates the users' favourite recipes with random data - likes for some recipes """
 def generate_user_likes(data_count):
-    user_likes = []
-    for _ in range(data_count):
-        user_likes.append(random.randint(0, 1))
+    #user_likes = []
+    #for _ in range(data_count):
+    #    user_likes.append(random.randint(0, 1))
+    #return user_likes
+    user_likes = np.random.choice([0, 1], size=(data_count,), p=[4./5, 1./5])
     return user_likes
 
 
 """ Gets the tf data from the json data """
-def get_tf_data(ingredient_data, ingredients_count):
+def get_tf_data(ingredient_data, ingredients_count, data):
     tf_data = []
     for ingredient_inner_data in ingredient_data.values():
         tf_inner_data = []
+        count = sum(ingredient_inner_data)
         for item in ingredient_inner_data:
-            tf_inner_data.append(item / math.sqrt(ingredients_count))
+            if item == 0:
+                tf_inner_data.append(0)
+            else:
+                tf_inner_data.append(math.log10(item / math.sqrt(count)) + 1)
         tf_data.append(tf_inner_data)
     print("tf_data count: " + str(len(tf_data)))
     return tf_data
@@ -51,10 +60,21 @@ def get_tf_data(ingredient_data, ingredients_count):
 def get_idf_data(ingredients_count_info, data_count):
     idf_data = []
     for item in ingredients_count_info.values():
-        idf_data.append(math.log10((1 + data_count) / (item + 1)))
+        #if item == 0:
+        #    idf_data.append(item)
+        #else:
+            idf_data.append(math.log((data_count) / (item + 1)))
     print("idf_data count: " + str(len(idf_data)))
     return idf_data
 
+""" Gets the tf-idf data from the tf_data and idf_data """
+def get_tfidf_data(tf_data, idf_data):
+    tfidf_data = list()
+    for i in range(data_count):
+        tf_list = tf_data[i]
+        tfidf_data.append(np.dot(tf_list, idf_data))
+    print(tfidf_data)
+    return tfidf_data
 
 """ Gets the ingreients from the json data """
 def get_ingredients(data):
@@ -222,10 +242,29 @@ def test_kmeans(tf_data, k):
     print("labels_\n" + str(kmeans.labels_))
     print("cluster_centers_\n" + str(kmeans.cluster_centers_))
 
+
+""" Finds the closest ingredients to be refactored and trimmed """
+def find_closest_ingredients(ingredients):
+    closest_ingredients = dict()
+    for item in ingredients:
+        closest_ingredients[item] = difflib.get_close_matches(item, ingredients)
+        print(item, closest_ingredients[item])
+    #print(closest_ingredients)
+   
+""" Tests the tf-idf transformer onto the ingredients data """     
+def tfidf_transform(ingredient_data):
+    transformer = TfidfTransformer(smooth_idf=True)
+    ingredient_data = [ v for v in ingredient_data.values() ]
+    tfidf = transformer.fit_transform(ingredient_data)
+    tfidf_result = tfidf.toarray()
+    #print(str(tfidf_result))
+    #print(len(tfidf_result))
+
 if __name__ == "__main__":
     if sys.platform == "win32":
         enable_win_unicode_console()
-    data = read_json()
+    json_file_name = "recipes_500_refined_edited.json"
+    data = read_json(json_file_name)
     # for recipe filtering by category id
     #recipe_category_id = 1
     #filter_data_by_category(recipe_category_id, data)
@@ -243,17 +282,28 @@ if __name__ == "__main__":
     ingredients_count = len(ingredients)
     n_closest_recipes = []
     n_closest_users = []
-
+    
     process_data(data, ingredients, ingredient_data, ingredients_count_info)
+    #find_closest_ingredients(ingredients)
+    
     idf_data = get_idf_data(ingredients_count_info, data_count)
-    tf_data = get_tf_data(ingredient_data, ingredients_count)
+    tf_data = get_tf_data(ingredient_data, ingredients_count, data)
+    #tfidf_data = get_tfidf_data(tf_data, idf_data)
+    #tfidf_transform(ingredient_data)
+
     user_likes = generate_user_likes(data_count)
     user_profile = generate_user_profile(tf_data, ingredients_count, user_likes)
     user_pref = generate_user_pref(data_count, tf_data, idf_data, user_profile)
     best_user_pref = max(user_pref)
     best_recipe_pref_index = user_pref.index(best_user_pref)
+    print("\n")
+    print("best recipe for user: " + str(data[best_recipe_pref_index]["name"]))
     n_largest_user_pref_indexes, n_largest_user_pref = get_n_largest_user_pref(best_user_pref_count, user_pref, user_likes)
-    n_closest_recipes = n_closest_recipes_to_best_recipe_pref(best_recipe_count, tf_data, best_recipe_pref_index)
+    print("n closest recipes to the best recipe for user: ")
+    print(str([(index, data[index]["name"]) for index in n_largest_user_pref_indexes]))
+    print("\n")
+    n_closest_recipe_indexes = n_closest_recipes_to_best_recipe_pref(best_recipe_count, tf_data, best_recipe_pref_index)
+    print(str([(index, data[index]["name"]) for index in n_closest_recipe_indexes]))
     #n_closest_users = n_closest_users_to_user_pref(best_user_pref_count, user_pref_data, user_pref)
 
     # sklearn_tests
