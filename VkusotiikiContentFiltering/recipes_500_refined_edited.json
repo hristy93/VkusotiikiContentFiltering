@@ -497,56 +497,68 @@
 		"dish": 1,
 		"region": 1
 	}, {
-		"name": "Шаран на фурна",
-		"description": "Шаранът се почиства и слага във вода и оцет за 30 минути. После се измива и подсушава. Шаранът се слага в намаслена тава и се овкусява с горчицата, солта и пипера. Налива се виното и тавата се връща в хладилника за още 20-тина минути. После се пече в предварително загрята на 200 С фурна около 20-30 минути. ",
+		"name": "Постен хляб с ядки",
+		"description": "Загрейте на 175 С фурната. Намазнете правоъгълна форма за кекс. Запържете целината и лука, сложете няколко лъжички вода и задушете за 3-4 минути. Смесете запържените зеленчуци с орехите, млякото, подправките, галетата и сол и пипер на вкус. Разбъркайте хубаво. Сложете в подготвената форма за кекс и печете за около 60 минути, или до готовност. ",
 		"duration": "90 мин.",
 		"ingredients": [{
-				"name": "шаран",
-				"quantity": "2",
-				"unit": "кг",
-				"unstructured_data": "2 кг шаран",
+				"name": "целина",
+				"quantity": "1/2",
+				"unit": "гл.",
+				"unstructured_data": "1/2 гл. целина",
 				"is_allergic": true
 			}, {
-				"name": "черен пипер",
+				"name": "лук кромид стар",
+				"quantity": "2",
+				"unit": "бр.",
+				"unstructured_data": "2 бр. лук кромид стар",
+				"is_allergic": false
+			}, {
+				"name": "орехови ядки",
 				"quantity": "1",
-				"unit": "щипка",
-				"unstructured_data": "1 щипка черен пипер",
+				"unit": "ч.ч.",
+				"unstructured_data": "1 ч.ч. орехови ядки",
+				"is_allergic": true
+			}, {
+				"name": "соево мляко",
+				"quantity": "2.50",
+				"unit": "ч.ч.",
+				"unstructured_data": "2.50 ч.ч. соево мляко",
+				"is_allergic": true
+			}, {
+				"name": "босилек",
+				"quantity": "1",
+				"unit": "ч.л.",
+				"unstructured_data": "1 ч.л. босилек",
+				"is_allergic": false
+			}, {
+				"name": "риган",
+				"quantity": "1",
+				"unit": "ч.л.",
+				"unstructured_data": "1 ч.л. риган",
+				"is_allergic": false
+			}, {
+				"name": "галета",
+				"quantity": "3",
+				"unit": "к.ч.",
+				"unstructured_data": "3 к.ч. галета",
 				"is_allergic": false
 			}, {
 				"name": "сол",
 				"quantity": "1",
+				"unit": "ч.л.",
+				"unstructured_data": "1 ч.л. сол",
+				"is_allergic": false
+			}, {
+				"name": "черен пипер",
+				"quantity": "2",
 				"unit": "щипка",
-				"unstructured_data": "1 щипка сол",
-				"is_allergic": false
-			}, {
-				"name": "горчица",
-				"quantity": "2",
-				"unit": "с.л.",
-				"unstructured_data": "2 с.л. горчица",
-				"is_allergic": true
-			}, {
-				"name": "вино бяло",
-				"quantity": "200",
-				"unit": "мл",
-				"unstructured_data": "200 мл вино бяло",
-				"is_allergic": false
-			}, {
-				"name": "оцет",
-				"quantity": "4",
-				"unit": "с.л.",
-				"unstructured_data": "4 с.л. оцет",
-				"is_allergic": false
-			}, {
-				"name": "олио",
-				"quantity": "2",
-				"unit": "с.л.",
-				"unstructured_data": "2 с.л. олио",
+				"unstructured_data": "2 щипка черен пипер млян",
 				"is_allergic": false
 			}
 		],
-		"difficulty": 2,
-		"servings": 1,
-		"user": "f121925d-d296-4818-870f-5f453389c4a8",
+		"difficulty": 3,
+		"servings": 4,
+		"user": 1,
 		"category": 1,
 		"dish": 1,
 		"region": 1
