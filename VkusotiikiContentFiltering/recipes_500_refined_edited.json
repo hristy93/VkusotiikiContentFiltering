@@ -12149,67 +12149,97 @@
 		"dish": 1,
 		"region": 1
 	}, {
-		"name": "Усукана пита",
-		"description": "В хладка вода се разтваря маята, заедно със солта, захарта, оцета и брашно, колкото да стане гъста каша. Оставя се така за 10-тина минути. После тази смес се изсипва в тава при останалото брашно. Добавят се яйцата (без 1 жълтък) и 5 с. л. олио. Замесва се тесто, което се оставя да почине. После се разделя на 4 топки. Всяка се намазва с олио и се оставят да втасат 30 минути. Всяка топка се разстила с ръце до правоъгълно парче, слага се натрошено сирене и се навива на руло. Слагат се в намазнена тавичка, като леко се усукват. Оставя се да втаса, намазва се с отделения жълтък и се пече на 180 С до готовност. ",
-		"duration": "> 90 м.",
+		"name": "Много богата оризова салата",
+		"description": "Сварете ориза в леко подсолена вода. Ако грахът е пресен, бланширайте го. Ако е замразен, само трябва да го размразите. А ако е от консерва, да го отцедите. Останалите продукти нарежете на дребно - доматите, туршията, кренвиршите, шунката, кашкавала, маслините. Смесете в купа всички продукти, прибавете и ориза. Овкусете със сол, оцет и зехтин. Наръсете с пресен магданоз. * Можете да я оставите за няколко часа в хладилник или да сервирате веднага. ",
+		"duration": "20 мин.",
 		"ingredients": [{
-				"name": "мая",
-				"quantity": "1",
-				"unit": "пак.",
-				"unstructured_data": "1 пак. мая",
+				"name": "ориз",
+				"quantity": "140",
+				"unit": "гр.",
+				"unstructured_data": "140 гр. ориз",
 				"is_allergic": false
 			}, {
-				"name": "вода",
-				"quantity": "400",
-				"unit": "мл",
-				"unstructured_data": "400 мл вода",
+				"name": "домати",
+				"quantity": "200",
+				"unit": "гр.",
+				"unstructured_data": "200 гр. домати",
+				"is_allergic": false
+			}, {
+				"name": "туршия",
+				"quantity": "150",
+				"unit": "гр.",
+				"unstructured_data": "150 гр. туршия",
+				"is_allergic": false
+			}, {
+				"name": "царевица сладка ",
+				"quantity": "100",
+				"unit": "гр.",
+				"unstructured_data": "100 гр. царевица сладка",
+				"is_allergic": false
+			}, {
+				"name": "грах",
+				"quantity": "100",
+				"unit": "гр.",
+				"unstructured_data": "100 гр. грах",
+				"is_allergic": false
+			}, {
+				"name": "риба тон ",
+				"quantity": "100",
+				"unit": "гр.",
+				"unstructured_data": "100 гр. риба тон",
+				"is_allergic": true
+			}, {
+				"name": "маслини без костилка ",
+				"quantity": "50",
+				"unit": "гр.",
+				"unstructured_data": "50 гр. маслини без костилка",
+				"is_allergic": false
+			}, {
+				"name": "кренвирши",
+				"quantity": "3",
+				"unit": "бр.",
+				"unstructured_data": "3 бр. кренвирши",
+				"is_allergic": true
+			}, {
+				"name": "шунка",
+				"quantity": "100",
+				"unit": "гр.",
+				"unstructured_data": "100 гр. шунка",
+				"is_allergic": false
+			}, {
+				"name": "кашкавал",
+				"quantity": "100",
+				"unit": "гр.",
+				"unstructured_data": "100 гр. кашкавал",
+				"is_allergic": true
+			}, {
+				"name": "магданоз пресен ",
+				"quantity": "1",
+				"unit": "с.л.",
+				"unstructured_data": "1 с.л. магданоз пресен",
+				"is_allergic": false
+			}, {
+				"name": "оцет",
+				"quantity": "2",
+				"unit": "с.л.",
+				"unstructured_data": "2 с.л. оцет",
 				"is_allergic": false
 			}, {
 				"name": "сол",
 				"quantity": "1",
+				"unit": "ч.л.",
+				"unstructured_data": "1 ч.л. сол",
+				"is_allergic": false
+			}, {
+				"name": "зехтин",
+				"quantity": "2",
 				"unit": "с.л.",
-				"unstructured_data": "1 с.л. сол",
+				"unstructured_data": "2 с.л. зехтин",
 				"is_allergic": false
-			}, {
-				"name": "оцет",
-				"quantity": "5",
-				"unit": "кап.",
-				"unstructured_data": "5 кап. оцет",
-				"is_allergic": false
-			}, {
-				"name": "захар",
-				"quantity": "1.50",
-				"unit": "с.л.",
-				"unstructured_data": "1.50 с.л. захар",
-				"is_allergic": false
-			}, {
-				"name": "брашно тип 500",
-				"quantity": "1",
-				"unit": "кг",
-				"unstructured_data": "1 кг брашно тип 500",
-				"is_allergic": true
-			}, {
-				"name": "яйца",
-				"quantity": "3",
-				"unit": "бр.",
-				"unstructured_data": "3 бр. яйца",
-				"is_allergic": true
-			}, {
-				"name": "олио",
-				"quantity": "10",
-				"unit": "с.л.",
-				"unstructured_data": "10 с.л. олио",
-				"is_allergic": false
-			}, {
-				"name": "сирене краве",
-				"quantity": "300",
-				"unit": "гр.",
-				"unstructured_data": "300 гр. сирене краве",
-				"is_allergic": true
 			}
 		],
-		"difficulty": 3,
-		"servings": 8,
+		"difficulty": 5,
+		"servings": 6,
 		"user": "fffae408-45a8-42e0-a361-2c5c0735645f",
 		"category": 1,
 		"dish": 1,

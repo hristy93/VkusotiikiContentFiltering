@@ -30,7 +30,7 @@ Algorithm:
 Testing:
  - kNN
  - kMeans
- - Naive Bayse
+ - Naive Bayes
 
 Functionalities:
  - finding the closest recipes to a given recipe by index
@@ -206,7 +206,7 @@ def process_data(data, ingredients, ingredient_data, ingredients_count_info, mea
         ingredient_inner_data_count = len(ingredient_inner_data.values())
         ingredients_count = len(ingredients)
         if ingredient_inner_data_count != ingredients_count:
-                print("error")
+            print("error")
     
         index += 1
         #print(data.index(recipe))
@@ -345,13 +345,13 @@ def n_closest_recipes_to_best_recipe_pref(best_recipe_count, tf_data, user_likes
     n_closest_recipe_indexes = nlargest(best_recipe_count, recipe_diff_modified, key=recipe_diff_modified.get)
     n_closest_recipes = {index : recipes_diff[index] for index in n_closest_recipe_indexes}
     #print("recipes_diff: " + str(recipes_diff))
-    print("The closest recipes to the recipe with the largest user pref:")
+    print("The closest recipes to the recipe with the largest user pref using VSM (Vector Space Model):")
     print("n_closest_recipes: ", str(n_closest_recipes))
     print("n_closest_recipe_indexes: ", str(n_closest_recipe_indexes))
     return n_closest_recipes, n_closest_recipe_indexes
 
 
-""" Gets the k closest recipes to the best prefered recipe using kNN alogorithm """
+""" Gets the k closest recipes to the best prefered recipe using kNN algorithm """
 def k_closest_recipes_with_knn(tf_data, filtered_tf_data, user_likes, k, best_recipe_pref_index):
     print("\nData from k closest recipes to the best prefered recipe using kNN with {} neighbours".format(k))
 
@@ -371,6 +371,23 @@ def k_closest_recipes_with_knn(tf_data, filtered_tf_data, user_likes, k, best_re
     print("indices\n", str(modified_indices))
     return modified_indices
 
+""" Gets presumably liked recipes by the user using Naive Bayes algorithm """
+def presumably_liked_recipes_with_naive_bayes(tf_data, recipe_ids_train, recipe_ids_test, user_likes):
+    print("\nData from the most presumably liked recipes by the user using Naive Bayes")
+    gnb = GaussianNB()
+    #y_pred = gnb.fit(tf_data, user_likes).predict(list(filtered_tf_data.values()))
+    y_pred = gnb.fit([tf_data[item] for item in recipe_ids_train], [user_likes[item] for item in recipe_ids_train]).predict([tf_data[item] for item in recipe_ids_test])
+    #y_pred = gnb.fit(tf_data, user_likes).predict([tf_data[item] for item in recipe_ids_test])
+    print("y_pred: ", y_pred)
+
+    #filtered_tf_data_keys = list(filtered_tf_data.keys())
+    #modified_indices = [filtered_tf_data_keys[index] for index, item in enumerate(y_pred) if item == 1]
+
+    #modified_indices = [recipe_ids_test[index] for index, item in enumerate(y_pred) if user_likes[item] == 1]
+
+    modified_indices = [recipe_ids_test[index] for index, item in enumerate(y_pred)]
+
+    return modified_indices
 
 """ Gets the n closest users to an user with a given user_pref """
 def n_closest_users_to_user_pref(best_user_pref_count, user_pref_data, user_pref):
@@ -466,9 +483,9 @@ def test_kmeans(tf_data, k, best_recipe_pref_index):
     #print("kmeans\n" + str(kmeans))
     #print("cluster_centers_\n" + str(kmeans.cluster_centers_))
 
-""" Tests the Naive Bayse method of sklearn module """
-def test_naive_bayse(tf_data, user_likes, best_user_pref_count, best_recipe_pref_index, X_train, X_test, y_train, y_test):
-    print("\nData from Naive Bayse")
+""" Tests the Naive Bayes method of sklearn module """
+def test_naive_bayes(tf_data, user_likes, best_user_pref_count, best_recipe_pref_index, X_train, X_test, y_train, y_test):
+    print("\nData from Naive Bayes")
     k_fold_count = 10
     gnb = GaussianNB()
     y_pred = gnb.fit(X_train, y_train).predict(X_test)
@@ -580,15 +597,15 @@ def print_accuracy_with_test_data(predicted_values, test_values, user_likes):
 
 """ Gets the user input for the type of likes (random wih some propability or some group of food) """
 def get_user_input():
-   use_radom_likes = input("Use random likes with some propability: (y) or (n) \n")
-   if use_radom_likes == "y":
-       propability_of_one = input("The propability of 1 is (in 0.## format): \n")
-       return float(propability_of_one)
-   elif use_radom_likes == "n":
-       food_group = input("Use group of food as likes: meat (1), fish (2) or vegetarian (3) \n")
-       return int(food_group)
-   else:
-       raise ValueError("Not correct input!")
+    use_radom_likes = input("Use random likes with some propability: (y) or (n) \n")
+    if use_radom_likes == "y":
+        propability_of_one = input("The propability of 1 is (in 0.## format): \n")
+        return float(propability_of_one)
+    elif use_radom_likes == "n":
+        food_group = input("Use group of food as likes: meat (1), fish (2) or vegetarian (3) \n")
+        return int(food_group)
+    else:
+        raise ValueError("Not correct input!")
 
 
 if __name__ == "__main__":
@@ -607,11 +624,9 @@ if __name__ == "__main__":
 
     meat_food = { "кайма", "телешк", "овч", "агнешк", "свинск", "суджук", "филе", "заеш", "месо", "кайма", "кренвирш", "кюфте", "говежд", "скарид", "овнешк", "пиле", "пуйка", "патешк", "надениц", "пушен", "колбас", "еленск", "шунка",  "гъши", "гъск", "бекон", "агнешк", "кървавиц", "салам" };
     fish_food = { "риба", "скумрия", "шаран", "рибн" , "рибен", "сьомга", "пъстърва", "ципура", "щука", "риба тон", "треска" }
-    fav_fish_recipe_ids = [448, 385, 5, 454, 455, 8, 330, 141, 462, 208, 211, 212, 24, 476, 222, 223, 164, 39, 40, 169, 426, 487, 174, 368, 498, 446, 184, 468, 378, 382]
-    fav_meat_recipe_ids = [0, 6, 10, 12, 14, 15, 18, 21, 22, 24, 27, 28, 29, 30, 31, 32, 34, 36, 37, 38, 43, 51, 54, 58, 62, 66, 69, 72, 73, 75, 76, 77, 78, 79, 82, 83, 84, 87, 91, 95, 98, 99, 101, 102, 103, 104, 106, 118, 119, 121, 123, 124, 127, 128, 130, 131, 132, 133, 134, 139, 142, 143, 146, 150, 151, 152, 157, 158, 160, 162, 163, 165, 166, 167, 172, 175, 180, 181, 184, 188, 189, 192, 193, 195, 199, 201, 204, 207, 208, 209, 213, 214, 216, 219, 223, 224, 231, 237, 239, 250, 251, 252, 253, 254, 255, 256, 258, 261, 262, 263, 264, 266, 269, 274, 275, 288, 291, 295, 296, 297, 298, 302, 307, 308, 309, 312, 313, 314, 315, 316, 318, 319, 321, 324, 325, 326, 328, 329, 331, 332, 337, 339, 347, 348, 349, 350, 351, 352, 354, 364, 372, 376, 378, 379, 380, 381, 384, 387, 388, 389, 395, 399, 406, 410, 411, 412, 414, 415, 419, 422, 432, 438, 439, 440, 441, 442, 444, 449, 453, 455, 456, 458, 459, 460, 462, 464, 465, 466, 467, 470, 471, 472, 473, 474, 475, 476, 477, 479, 480, 483, 487, 494, 495, 497, 498]
-    fav_vegetarian_recipe_ids = [1, 2, 3, 4, 7, 9, 11, 13, 16, 17, 19, 20, 23, 25, 26, 33, 35, 41, 42, 44, 45, 46, 47, 48, 49, 50, 52, 53, 55, 56, 57, 59, 60, 61, 63, 64, 65, 67, 68, 70, 71, 74, 80, 81, 85, 86, 88, 89, 90, 92, 93, 94, 96, 97, 100, 105, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 120, 122, 125, 126, 129, 135, 136, 137, 138, 140, 144, 145, 147, 148, 149, 153, 154, 155, 156, 159, 161, 168, 170, 171, 173, 176, 177, 178, 179, 182, 183, 185, 186, 187, 190, 191, 194, 196, 197, 198, 200, 202, 203, 205, 206, 210, 215, 217, 218, 220, 221, 225, 226, 227, 228, 229, 230, 232, 233, 234, 235, 236, 238, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 257, 259, 260, 265, 267, 268, 270, 271, 272, 273, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 289, 290, 292, 293, 294, 299, 300, 301, 303, 304, 305, 306, 310, 311, 317, 320, 322, 323, 327, 333, 334, 335, 336, 338, 340, 341, 342, 343, 344, 345, 346, 353, 355, 356, 357, 358, 359, 360, 361, 362, 363, 365, 366, 367, 369, 370, 371, 373, 374, 375, 377, 383, 386, 390, 391, 392, 393, 394, 396, 397, 398, 400, 401, 402, 403, 404, 405, 407, 408, 409, 413, 416, 417, 418, 420, 421, 423, 424, 425, 427, 428, 429, 430, 431, 433, 434, 435, 436, 437, 443, 445, 447, 450, 451, 452, 457, 461, 463, 469, 478, 481, 482, 484, 485, 486, 488, 489, 490, 491, 492, 493, 496, 499]
-
-    #TODO - remove Усукана пита from the json (it has a duplicate)
+    fav_fish_recipe_ids = [448, 385, 5, 454, 455, 8, 330, 141, 462, 208, 211, 212, 446, 24, 476, 222, 223, 164, 39, 40, 169, 426, 487, 174, 368, 498, 190, 184, 468, 378, 382]
+    fav_meat_recipe_ids = [0, 6, 10, 12, 14, 15, 18, 21, 22, 24, 27, 28, 29, 30, 31, 32, 34, 36, 37, 38, 43, 51, 54, 58, 62, 66, 69, 72, 73, 75, 76, 77, 78, 79, 82, 83, 84, 87, 91, 95, 98, 99, 101, 102, 103, 104, 106, 118, 119, 121, 123, 124, 127, 128, 130, 131, 132, 133, 134, 139, 142, 143, 146, 150, 151, 152, 157, 158, 160, 162, 163, 165, 166, 167, 172, 175, 180, 181, 184, 188, 189, 190, 192, 193, 195, 199, 201, 204, 207, 208, 209, 213, 214, 216, 219, 223, 224, 231, 237, 239, 250, 251, 252, 253, 254, 255, 256, 258, 261, 262, 263, 264, 266, 269, 274, 275, 288, 291, 295, 296, 297, 298, 302, 307, 308, 309, 312, 313, 314, 315, 316, 318, 319, 321, 324, 325, 326, 328, 329, 331, 332, 337, 339, 347, 348, 349, 350, 351, 352, 354, 364, 372, 376, 378, 379, 380, 381, 384, 387, 388, 389, 395, 399, 406, 410, 411, 412, 414, 415, 419, 422, 432, 438, 439, 440, 441, 442, 444, 449, 453, 455, 456, 458, 459, 460, 462, 464, 465, 466, 467, 470, 471, 472, 473, 474, 475, 476, 477, 479, 480, 483, 487, 494, 495, 497, 498]
+    fav_vegetarian_recipe_ids = [1, 2, 3, 4, 7, 9, 11, 13, 16, 17, 19, 20, 23, 25, 26, 33, 35, 41, 42, 44, 45, 46, 47, 48, 49, 50, 52, 53, 55, 56, 57, 59, 60, 61, 63, 64, 65, 67, 68, 70, 71, 74, 80, 81, 85, 86, 88, 89, 90, 92, 93, 94, 96, 97, 100, 105, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 120, 122, 125, 126, 129, 135, 136, 137, 138, 140, 144, 145, 147, 148, 149, 153, 154, 155, 156, 159, 161, 168, 170, 171, 173, 176, 177, 178, 179, 182, 183, 185, 186, 187, 191, 194, 196, 197, 198, 200, 202, 203, 205, 206, 210, 215, 217, 218, 220, 221, 225, 226, 227, 228, 229, 230, 232, 233, 234, 235, 236, 238, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 257, 259, 260, 265, 267, 268, 270, 271, 272, 273, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 289, 290, 292, 293, 294, 299, 300, 301, 303, 304, 305, 306, 310, 311, 317, 320, 322, 323, 327, 333, 334, 335, 336, 338, 340, 341, 342, 343, 344, 345, 346, 353, 355, 356, 357, 358, 359, 360, 361, 362, 363, 365, 366, 367, 369, 370, 371, 373, 374, 375, 377, 383, 386, 390, 391, 392, 393, 394, 396, 397, 398, 400, 401, 402, 403, 404, 405, 407, 408, 409, 413, 416, 417, 418, 420, 421, 423, 424, 425, 427, 428, 429, 430, 431, 433, 434, 435, 436, 437, 443, 445, 447, 450, 451, 452, 457, 461, 463, 469, 478, 481, 482, 484, 485, 486, 488, 489, 490, 491, 492, 493, 496, 499]
 
     # reads the recipes data from the json file
     data = read_json(json_file_name)
@@ -673,17 +688,17 @@ if __name__ == "__main__":
     #tfidf_transform(ingredient_data)
 
     # gerenates the indexes of the recipes that contain some ingredients
-    #favourite_meat_recipe_ids = get_favourite_recipe_ids(data, meat_food)
-    #favourite_fish_recipe_ids = get_favourite_recipe_ids(data, fish_food)
-    #print("favourite_meat_recipe_ids: ", favourite_meat_recipe_ids.keys())
-    #print(len(favourite_meat_recipe_ids))
-    #print("favourite_fish_recipe_ids: ", favourite_fish_recipe_ids.keys())
-    #print(len(favourite_fish_recipe_ids))
+    #fav_meat_recipe_ids = get_favourite_recipe_ids(data, meat_food)
+    #fav_fish_recipe_ids = get_favourite_recipe_ids(data, fish_food)
+    #print("fav_meat_recipe_ids: ", fav_meat_recipe_ids.keys())
+    #print(len(fav_meat_recipe_ids))
+    #print("fav_fish_recipe_ids: ", fav_fish_recipe_ids.keys())
+    #print(len(fav_fish_recipe_ids))
 
-    #favorite_vegetarian_recipe_ids = [id for id in range(0, data_count) if id not in favourite_meat_recipe_ids.keys()
-    #                             and id not in favourite_fish_recipe_ids.keys()]
-    #print("favorite_vegetarian_recipe_ids: ", favorite_vegetarian_recipe_ids)
-    #print(len(favorite_vegetarian_recipe_ids))
+    #fav_vegetarian_recipe_ids = [id for id in range(0, data_count) if id not in fav_meat_recipe_ids.keys()
+    #                             and id not in fav_fish_recipe_ids.keys()]
+    #print("fav_vegetarian_recipe_ids: ", fav_vegetarian_recipe_ids)
+    #print(len(fav_vegetarian_recipe_ids))
 
     # genrerates user likes on random or by some group of foods
     if use_random_likes:
@@ -733,9 +748,13 @@ if __name__ == "__main__":
     if not use_random_likes:
         print_accuracy_with_test_data(knn_data_indexes, recipe_ids_test, user_likes)
 
+    naive_bayes_recipe_indexes = presumably_liked_recipes_with_naive_bayes(tf_data, recipe_ids_train, recipe_ids_test, user_likes)
+    if not use_random_likes:
+        print_accuracy_with_test_data(naive_bayes_recipe_indexes, recipe_ids_test, user_likes)
+
     #TODO - add closest recipes by category
 
-    # sklearn tests - kMeans, kNN, Naive Bayse
+    # sklearn tests - kMeans, kNN, Naive Bayes
 
     k_means_data_indexes = test_kmeans(tf_data, data_count // best_user_pref_count, best_recipe_pref_index)
     print_recipes_info(data, k_means_data_indexes)
@@ -744,4 +763,4 @@ if __name__ == "__main__":
 
     #test_knn(tf_data, user_likes, int(math.sqrt(data_count)), best_recipe_pref_index)
 
-    naive_bayse_data = test_naive_bayse(tf_data, user_likes, best_user_pref_count, best_recipe_pref_index, X_train, X_test, y_train, y_test)
+    #naive_bayes_data = test_naive_bayes(tf_data, user_likes, best_user_pref_count, best_recipe_pref_index, X_train, X_test, y_train, y_test)
