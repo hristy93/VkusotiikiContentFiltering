@@ -118,7 +118,7 @@ def get_idf_data(ingredients_count_info, data_count):
 
 
 """ Gets the tf-idf data from the tf_data and idf_data """
-def get_tfidf_data(tf_data, idf_data):
+def get_tfidf_data(tf_data, idf_data, data_count):
     tfidf_data = list()
     for i in range(data_count):
         tf_list = tf_data[i]
@@ -129,6 +129,7 @@ def get_tfidf_data(tf_data, idf_data):
 
 """ Gets the ingreients from the json data """
 def get_ingredients(data):
+    ingredients = set()
     for item in data:
         for ingredient in item['ingredients']:
             if ingredient['name'] != '':
@@ -694,11 +695,7 @@ def get_user_input():
         raise ValueError("Not correct input!")
 
 
-if __name__ == "__main__":
-    # enables the unicode console encoding on Windows
-    if sys.platform == "win32":
-        enable_win_unicode_console()
-
+def prepare_data():
     # defines some variables and constants
     json_file_name = "recipes_500_refined_edited.json"
     propability_of_one = 0.8
@@ -777,7 +774,7 @@ if __name__ == "__main__":
     # generates the tf, idf and tf-idf data
     idf_data = get_idf_data(ingredients_count_info, data_count)
     tf_data = get_tf_data(ingredient_data, data)
-    tfidf_data = get_tfidf_data(tf_data, idf_data)
+    tfidf_data = get_tfidf_data(tf_data, idf_data, data_count)
     #tfidf_transform(ingredient_data)
 
     # gerenates the indexes of the recipes that contain some ingredients
@@ -794,11 +791,43 @@ if __name__ == "__main__":
     #print(len(fav_vegetarian_recipe_ids))
 
     # genrerates user likes on random or by some group of foods
+    recipe_ids_train, recipe_ids_test = [], []
     if use_random_likes:
         user_likes = generate_user_likes(data_count, binary_propabilities)
     else:
         recipe_ids_train, recipe_ids_test = train_test_split(fav_recipe_ids)
         user_likes = generate_user_likes_by_recipes_ids(data_count, recipe_ids_train)
+
+    return {
+        'data': data,
+        'ingredients': ingredients,
+        'ingredients_count': ingredients_count,
+        'data_count': data_count,
+        'tf_data': tf_data,
+        'idf_data': idf_data,
+        'user_likes': user_likes,
+        'best_user_pref_count': best_user_pref_count,
+        'use_random_likes': use_random_likes,
+        'recipe_ids_test': recipe_ids_test,
+        'best_recipe_count': best_recipe_count,
+        'recipe_ids_train': recipe_ids_train,
+    }
+
+
+def main():
+    fetched_data = prepare_data()
+    data = fetched_data.get('data')
+    ingredients = fetched_data.get('ingredients')
+    ingredients_count = fetched_data.get('ingredients_count')
+    data_count = fetched_data.get('data_count')
+    tf_data = fetched_data.get('tf_data')
+    idf_data = fetched_data.get('idf_data')
+    user_likes = fetched_data.get('user_likes')
+    best_user_pref_count = fetched_data.get('best_user_pref_count')
+    use_random_likes = fetched_data.get('use_random_likes')
+    recipe_ids_test = fetched_data.get('recipe_ids_test')
+    best_recipe_count = fetched_data.get('best_recipe_count')
+    recipe_ids_train = fetched_data.get('recipe_ids_train')
 
     # split the tf_data and user_likes into training and testing data
     X_train, X_test, y_train, y_test = train_test_split(tf_data, user_likes)
@@ -863,3 +892,10 @@ if __name__ == "__main__":
     #best_k_for_knn = test_knn(tf_data, user_likes, recipe_ids_train, recipe_ids_test, data_count // 2, best_recipe_pref_index)
 
     #naive_bayes_data = test_naive_bayes(tf_data, user_likes, best_user_pref_count, best_recipe_pref_index, X_train, X_test, y_train, y_test)
+
+
+if __name__ == "__main__":
+        # enables the unicode console encoding on Windows
+    if sys.platform == "win32":
+        enable_win_unicode_console()
+    main()
