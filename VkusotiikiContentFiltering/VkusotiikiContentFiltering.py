@@ -467,8 +467,10 @@ def test_knn(tf_data, user_likes, recipe_ids_train, recipe_ids_test, max_k, best
         knn_average_accuracy_scores[k] = knn_average_accuracy_score
         #print("average accuracy score for k = {} is : {}".format(k,  knn_average_accuracy_score))
     #print(knn_average_accuracy_scores)
-    print("The best value for k is: ", [key for key, value in knn_average_accuracy_scores.items() 
-                                    if value == max(knn_average_accuracy_scores.values())][0])
+    best_k = [key for key, value in knn_average_accuracy_scores.items() 
+                                    if value == max(knn_average_accuracy_scores.values())][0]
+    print("The best value for k is: ", best_k)
+    return best_k
 
 
 """ Tests the k-Means methods of sklearn module with k-fold crossvalidation """
@@ -683,10 +685,10 @@ def print_accuracy_with_test_data(predicted_values, test_values, user_likes):
 def get_user_input():
     use_radom_likes = input("Use random likes with some propability: (y) or (n) \n")
     if use_radom_likes == "y":
-        propability_of_one = input("The propability of 1 is (in 0.## format): \n")
+        propability_of_one = input("The propability of like for a recipe is (in 0.## format): \n")
         return float(propability_of_one)
     elif use_radom_likes == "n":
-        food_group = input("Use group of food as likes: meat (1), fish (2) or vegetarian (3) \n")
+        food_group = input("Like a group of recipes with: meat (1), fish (2) or vegetarian products (3) \n")
         return int(food_group)
     else:
         raise ValueError("Not correct input!")
@@ -731,6 +733,7 @@ if __name__ == "__main__":
     ingredients_count = len(ingredients)
     n_closest_recipes = []
     n_closest_users = []
+    fav_recipe_ids = fav_meat_recipe_ids
 
     # processes the user input
     if use_user_input:
@@ -750,6 +753,12 @@ if __name__ == "__main__":
         else:
             propability_of_one = user_input
             use_random_likes = True
+
+    else:
+        if use_random_likes:
+            print("The user will use random likes with {} propability of like for a recipe".format(propability_of_one))
+        else:
+            print("The user will only like a group of recipes with meat")
 
     binary_propabilities = [1 - propability_of_one, propability_of_one]
     
@@ -833,24 +842,24 @@ if __name__ == "__main__":
         print_accuracy_with_test_data(knn_data_indexes, recipe_ids_test, user_likes)
 
     # gets some presumably likes recipes by the user using the Naive Bayes
-    naive_bayes_recipe_indexes = presumably_liked_recipes_with_naive_bayes(tf_data, recipe_ids_train, recipe_ids_test, user_likes)
     if not use_random_likes:
+        naive_bayes_recipe_indexes = presumably_liked_recipes_with_naive_bayes(tf_data, recipe_ids_train, recipe_ids_test, user_likes)
         print_accuracy_with_test_data(naive_bayes_recipe_indexes, recipe_ids_test, user_likes)
 
-    k_means_data_indexes = closest_recipes_with_kmeans(tf_data, filtered_tf_data, best_k_for_kmeans, best_recipe_pref_index)
+    k_means_data_indexes = closest_recipes_with_kmeans(tf_data, filtered_tf_data, int(math.sqrt(len(filtered_tf_data))), best_recipe_pref_index)
     print_recipes_info(data, k_means_data_indexes)
-    if not use_random_likes:
+    if not use_random_likes: 
         print_accuracy_with_test_data(k_means_data_indexes, recipe_ids_test, user_likes)
 
-    #TODO - add closest recipes by category
+    #TODO - add closest recipes by category if everything is ok
 
     # sklearn tests - kMeans, kNN, Naive Bayes
 
     # not working
     #test_kmeans_with_kfold_crossvalidation(tf_data, filtered_tf_data, user_likes, int(math.sqrt(len(filtered_tf_data))), best_recipe_pref_index)
 
-    best_k_for_kmeans = test_kmeans_with_variance(tf_data, filtered_tf_data, user_likes, int(math.sqrt(len(filtered_tf_data))) + 1, best_recipe_pref_index)
+    #best_k_for_kmeans = test_kmeans_with_variance(tf_data, filtered_tf_data, user_likes, int(math.sqrt(len(filtered_tf_data))) + 1, best_recipe_pref_index)
 
-    #test_knn(tf_data, user_likes, recipe_ids_train, recipe_ids_test, data_count // 2, best_recipe_pref_index)
+    #best_k_for_knn = test_knn(tf_data, user_likes, recipe_ids_train, recipe_ids_test, data_count // 2, best_recipe_pref_index)
 
     #naive_bayes_data = test_naive_bayes(tf_data, user_likes, best_user_pref_count, best_recipe_pref_index, X_train, X_test, y_train, y_test)
