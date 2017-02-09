@@ -20,6 +20,7 @@ from scipy.spatial.distance import cdist
 from scipy.spatial.distance import pdist
 import matplotlib.pyplot as plt
 #from sklearn import datasets, preprocessing
+#from k_nearest_neighbours import *
 import random
 
 
@@ -343,13 +344,19 @@ def k_closest_recipes_with_knn(tf_data, filtered_tf_data, user_likes, k, best_re
     knn = NearestNeighbors(n_neighbors=k, algorithm='kd_tree')
     #TODO - find if pop is the best way to get all items but one with a specific index
     best_recipe_pref = tf_data.pop(best_recipe_pref_index)
-    #filtered_tf_data = {tf_data.index(item) : item for item in tf_data if user_likes[tf_data.index(item)] == 0}
+    filtered_tf_data_keys = list(filtered_tf_data.keys())
+    if best_recipe_pref_index in filtered_tf_data_keys:
+        filtered_tf_data.pop(best_recipe_pref_index)
+
     arr = np.array(list(filtered_tf_data.values()))
     nbrs = knn.fit(arr)
+
+    if best_recipe_pref_index in filtered_tf_data_keys:
+        filtered_tf_data[best_recipe_pref_index] = best_recipe_pref
     tf_data.append(best_recipe_pref)
+
     distances, indices = nbrs.kneighbors((best_recipe_pref,), k)
 
-    filtered_tf_data_keys = list(filtered_tf_data.keys())
     modified_indices = [filtered_tf_data_keys[item] for item in indices[0]]
 
     print("distances\n", str(distances[0]))
@@ -362,6 +369,8 @@ def closest_recipes_with_kmeans(tf_data, filtered_tf_data, k, best_recipe_pref_i
     print("\nData from closest recipes to the best prefered recipe using kMeans with {} clusteres".format(k))
 
     arr = np.array(list(filtered_tf_data.values()))
+    filtered_tf_data_keys = list(filtered_tf_data.keys())
+
     kmeans = KMeans(n_clusters=k)
     clustered_data = kmeans.fit(arr)
     distance_data = kmeans.transform(arr)
@@ -371,7 +380,6 @@ def closest_recipes_with_kmeans(tf_data, filtered_tf_data, k, best_recipe_pref_i
     print("distance_data count: ", str(len(distance_data)))
     print("predicted_cluster: ", str(predicted_cluster))
 
-    filtered_tf_data_keys = list(filtered_tf_data.keys())
     modified_indices = [filtered_tf_data_keys[index] for index, item in enumerate(clustered_data.labels_)
                         if item == predicted_cluster]
 
@@ -481,10 +489,9 @@ def test_kmeans_with_kfold_crossvalidation(tf_data, filtered_tf_data, user_likes
     kf = KFold(n_splits=k_fold_count)
     kmeans_average_accuracy_scores = []
     for k in range(1, max_k):
-        #print("\ndata from kNN with {} neighbours".format(k))
+        #print("\ndata from kMeans with {} neighbours".format(k))
         kmeans_accuracy_scores = []
         kmeans = KMeans(n_clusters=k)
-        knn_accuracy_scores = []
         for train_index, test_index in kf.split(tf_data, user_likes):
             X_train = [tf_data[index] for index in train_index]
             X_test = [tf_data[index] for index in test_index]
@@ -571,10 +578,11 @@ def test_kmeans_with_variance(tf_data, filtered_tf_data, user_likes, max_k, best
 
 
 """ Tests the Naive Bayes method of sklearn module """
-def test_naive_bayes(tf_data, user_likes, best_user_pref_count, best_recipe_pref_index, X_train, X_test, y_train, y_test):
+def test_naive_bayes(tf_data, user_likes, best_user_pref_count, best_recipe_pref_index):
     print("\nData from Naive Bayes")
     k_fold_count = 10
     gnb = GaussianNB()
+    X_train, X_test, y_train, y_test = train_test_split(tf_data, user_likes)
     y_pred = gnb.fit(X_train, y_train).predict(X_test)
 
     print("y_pred: ", y_pred)
@@ -731,6 +739,8 @@ def prepare_data():
     n_closest_recipes = []
     n_closest_users = []
     fav_recipe_ids = fav_meat_recipe_ids
+    recipe_ids_train = []
+    recipe_ids_test = []
 
     # processes the user input
     if use_user_input:
@@ -795,8 +805,15 @@ def prepare_data():
     if use_random_likes:
         user_likes = generate_user_likes(data_count, binary_propabilities)
     else:
+        # old implementation
         recipe_ids_train, recipe_ids_test = train_test_split(fav_recipe_ids)
         user_likes = generate_user_likes_by_recipes_ids(data_count, recipe_ids_train)
+
+        #new implementation
+        #user_likes = generate_user_likes_by_recipes_ids(data_count, fav_recipe_ids)
+
+        # split the tf_data and user_likes into training and testing data
+        #tf_data_train, tf_data_test, likes_train, likes_test = train_test_split(tf_data, user_likes)
 
     return {
         'data': data,
@@ -828,9 +845,6 @@ def main():
     recipe_ids_test = fetched_data.get('recipe_ids_test')
     best_recipe_count = fetched_data.get('best_recipe_count')
     recipe_ids_train = fetched_data.get('recipe_ids_train')
-
-    # split the tf_data and user_likes into training and testing data
-    X_train, X_test, y_train, y_test = train_test_split(tf_data, user_likes)
 
     # creates the user profile and his/her recipe preference and gets the most suitable recipe
     user_profile = generate_user_profile(tf_data, ingredients_count, user_likes)
@@ -891,7 +905,7 @@ def main():
 
     #best_k_for_knn = test_knn(tf_data, user_likes, recipe_ids_train, recipe_ids_test, data_count // 2, best_recipe_pref_index)
 
-    #naive_bayes_data = test_naive_bayes(tf_data, user_likes, best_user_pref_count, best_recipe_pref_index, X_train, X_test, y_train, y_test)
+    #naive_bayes_data = test_naive_bayes(tf_data, user_likes, best_user_pref_count, best_recipe_pref_index)
 
 
 if __name__ == "__main__":
