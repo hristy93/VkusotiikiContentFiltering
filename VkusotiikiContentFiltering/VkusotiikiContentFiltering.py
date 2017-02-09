@@ -795,8 +795,8 @@ def prepare_data():
     if use_random_likes:
         user_likes = generate_user_likes(data_count, binary_propabilities)
     else:
-        recipe_ids_train, recipe_ids_test = train_test_split(fav_recipe_ids)
-        user_likes = generate_user_likes_by_recipes_ids(data_count, recipe_ids_train)
+        # recipe_ids_train, recipe_ids_test = train_test_split(fav_recipe_ids)
+        user_likes = generate_user_likes_by_recipes_ids(data_count, fav_recipe_ids)
 
     return {
         'data': data,
