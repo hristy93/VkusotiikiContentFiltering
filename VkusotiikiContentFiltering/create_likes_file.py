@@ -6,9 +6,10 @@ from VkusotiikiContentFiltering import prepare_data, get_recipes_names
 def create_file():
     """Create file with recipes ids, recipes titles and default values for likes."""
     data = prepare_data().get('data')
+    print()
+
     recipes_names = get_recipes_names(data)
-    print(len(recipes_names))
-    print(recipes_names[0])
+    print('Add', len(recipes_names), 'recipes')
 
     # Create an new Excel file and add a worksheet.
     workbook = xlsxwriter.Workbook('recipes.xlsx')
@@ -26,6 +27,7 @@ def create_file():
 
     workbook.close()
 
+    print('File created!')
 
 if __name__ == '__main__':
     create_file()
