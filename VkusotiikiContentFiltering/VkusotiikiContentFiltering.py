@@ -814,6 +814,14 @@ def prepare_data():
     }
 
 
+def get_recipes_names(data):
+    names = []
+
+    # for recipe in data:
+    #     names.append(recipe.get('name'))
+    return [recipe.get('name') for recipe in data]
+
+
 def main():
     fetched_data = prepare_data()
     data = fetched_data.get('data')
