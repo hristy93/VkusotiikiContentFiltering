@@ -341,6 +341,9 @@ def k_closest_recipes_with_knn(tf_data, filtered_tf_data, user_likes, k, best_re
     print("\nData from k closest recipes to the best prefered recipe using kNN with {} neighbours".format(k))
 
     knn = NearestNeighbors(n_neighbors=k, algorithm='kd_tree')
+    print('------------------------------------------------------------------')
+    print(knn)
+    print('------------------------------------------------------------------')
     #TODO - find if pop is the best way to get all items but one with a specific index
     best_recipe_pref = tf_data.pop(best_recipe_pref_index)
     #filtered_tf_data = {tf_data.index(item) : item for item in tf_data if user_likes[tf_data.index(item)] == 0}
@@ -724,9 +727,7 @@ def prepare_data():
     print("data count: " + str(data_count))
     ingredient_data = dict()
     ingredients_count_info = dict()
-    ingredients = set()
-    ingredients = get_ingredients(data)
-    ingredients = list(ingredients)
+    ingredients = list(get_ingredients(data))
     ingredients_count = len(ingredients)
     n_closest_recipes = []
     n_closest_users = []
@@ -811,6 +812,9 @@ def prepare_data():
         'recipe_ids_test': recipe_ids_test,
         'best_recipe_count': best_recipe_count,
         'recipe_ids_train': recipe_ids_train,
+        'tfidf_data': tfidf_data,
+        'ingredient_data': ingredient_data,
+        'fav_meat_recipe_ids': fav_meat_recipe_ids,
     }
 
 
