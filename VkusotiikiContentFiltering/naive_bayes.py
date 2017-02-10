@@ -1,134 +1,126 @@
-from VkusotiikiContentFiltering import prepare_data, enable_win_unicode_console
 import sys
 import random
 import math
+from VkusotiikiContentFiltering import prepare_data, enable_win_unicode_console
 from sklearn.model_selection import train_test_split
+from numpy import mean
+
 
 def main():
     fetched_data = prepare_data()
-    data = fetched_data.get('data')
-    ingredients = fetched_data.get('ingredients')
-    ingredients_count = fetched_data.get('ingredients_count')
-    data_count = fetched_data.get('data_count')
     tf_data = fetched_data.get('tf_data')
-    idf_data = fetched_data.get('idf_data')
     user_likes = fetched_data.get('user_likes')
-    best_user_pref_count = fetched_data.get('best_user_pref_count')
-    use_random_likes = fetched_data.get('use_random_likes')
-
     recipe_ids_test = fetched_data.get('recipe_ids_test')
-    best_recipe_count = fetched_data.get('best_recipe_count')
     recipe_ids_train = fetched_data.get('recipe_ids_train')
-    naive_bayes(tf_data, user_likes)
 
-    splitRatio = 0.67
-    #trainingSet, testSet = splitDataset(dataset, splitRatio)
-    #print('Split {0} rows into train={1} and test={2} rows').format(len(dataset), len(trainingSet), len(testSet))
-    # prepare model
-    train_set, test_set = train_test_split(tf_data)
-    print("train_set likes", [item[-1] for item in train_set])
-    print("test_set likes", [item[-1] for item in test_set])
-    #test_set = [tf_data[item] for item in recipe_ids_test]
-    #train_set = [tf_data[item] for item in recipe_ids_train]
-    summaries = summarizeByClass(train_set)
-    # test model
-    # print("recipe_ids_train", recipe_ids_train)
-    # print("recipe_ids_train likes", [user_likes[item] for item in recipe_ids_train])
-    # print("recipe_ids_test", recipe_ids_test)
-    # print("recipe_ids_test likes", [user_likes[item] for item in recipe_ids_test])
-    predictions = getPredictions(summaries, test_set)
-    accuracy = getAccuracy(test_set, predictions)
+    train_tf_data, test_tf_data, train_likes, test_likes = train_test_split(tf_data, user_likes)
+    #test_tf_data = [tf_data[item] for item in recipe_ids_test]
+    #train_tf_data = [tf_data[item] for item in recipe_ids_train]
+
+    class_statistical_data = get_statistical_data_by_class(train_tf_data, train_likes)
+
+    #print("train_tf_data: ", train_tf_data)
+    print("train_likes: ", train_likes)
+    #print("test_tf_data: ", test_tf_data)
+    print("test_likes: ", test_likes)
+
+    predictions = get_predictions(class_statistical_data, test_tf_data)
+    accuracy = get_accuracy(test_likes, predictions)
     print("predictions: ", predictions, len(predictions))
-    print('Accuracy: {}'.format(accuracy))
+    print('accuracy: {}'.format(accuracy))
 
 
-def naive_bayes(tf_data, user_likes):
-    for index, tf_item in enumerate(tf_data):
-        tf_item.append(user_likes[index])
+def group_tf_data_by_class(tf_data, user_likes):
+    grouped_tf_data = {}
+    grouped_tf_data[0] = list()
+    grouped_tf_data[1] = list()
+
+    for tf_index, tf_value in enumerate(tf_data):
+        tf_value_like = user_likes[tf_index]
+        grouped_tf_data[tf_value_like].append(tf_value)
+
+    return grouped_tf_data
 
 
-def splitDataset(dataset, splitRatio):
-    trainSize = int(len(dataset) * splitRatio)
-    trainSet = []
-    copy = list(dataset)
-    while len(trainSet) < trainSize:
-        index = random.randrange(len(copy))
-        trainSet.append(copy.pop(index))
-    return [trainSet, copy]
+def standard_deviation(tf_values):
+    avg = mean(tf_values)
+    variance = sum([pow(x - avg,2) for x in tf_values])/float(len(tf_values)-1)
+    deviation = math.sqrt(variance)
+    return deviation
  
-def separateByClass(dataset):
-    separated = {}
-    for i in range(len(dataset)):
-        vector = dataset[i]
-        if (vector[-1] not in separated):
-            separated[vector[-1]] = []
-        separated[vector[-1]].append(vector)
-    return separated
- 
-def mean(numbers):
-    return sum(numbers)/float(len(numbers))
- 
-def stdev(numbers):
-    avg = mean(numbers)
-    variance = sum([pow(x-avg,2) for x in numbers])/float(len(numbers)-1)
-    return math.sqrt(variance)
- 
-def summarize(dataset):
-    summaries = [(mean(attribute), stdev(attribute)) for attribute in zip(*dataset)]
-    #print("summaries", summaries, len(summaries))
-    # print("----------------")
-    # print(list(zip(*dataset)))
-    del summaries[-1]
-    return summaries
- 
-def summarizeByClass(dataset):
-    separated = separateByClass(dataset)
-    summaries = {}
-    for classValue, instances in separated.items():
-        summaries[classValue] = summarize(instances)
-    return summaries
- 
-def calculateProbability(x, mean, stdev):
-    if stdev != 0:
-        exponent = math.exp(-(math.pow(x-mean,2)/(2*math.pow(stdev,2))))
-        probability = (1 / (math.sqrt(2*math.pi) * stdev)) * exponent
+
+def get_attribute_probability(input_value, mean, standard_deviation):
+    if standard_deviation != 0:
+        input_value_diff = input_value - mean
+        exponent = math.exp(-((input_value_diff * input_value_diff) / (2  * standard_deviation * standard_deviation)))
+        probability = (1 / (math.sqrt(2*math.pi) * standard_deviation)) * exponent
     else:
         probability = 1
+
     return probability
- 
-def calculateClassProbabilities(summaries, inputVector):
-    probabilities = {}
-    for classValue, classSummaries in summaries.items():
-        probabilities[classValue] = 1
-        for i in range(len(classSummaries)):
-            mean, stdev = classSummaries[i]
-            x = inputVector[i]
-            probabilities[classValue] *= calculateProbability(x, mean, stdev)
+
+
+def get_class_probabilities(class_statistical_data, input_data):
+    probabilities = dict()
+
+    for class_id, class_statistical_value in class_statistical_data.items():
+        probabilities[class_id] = 1
+        for index in range(len(class_statistical_value)):
+            input_value = input_data[index]
+            mean, standard_deviation = class_statistical_value[index]
+            probabilities[class_id] *= get_attribute_probability(input_value, mean, standard_deviation)
+
     return probabilities
-            
-def predict(summaries, inputVector):
-    probabilities = calculateClassProbabilities(summaries, inputVector)
-    print("probabilities :", probabilities) 
-    bestLabel, bestProb = None, -1
-    for classValue, probability in probabilities.items():
-        if bestLabel is None or probability > bestProb:
-            bestProb = probability
-            bestLabel = classValue
-    return bestLabel
+
+
+def get_statistical_data(dataset):
+    statistical_data = [(mean(attribute), standard_deviation(attribute)) for attribute in zip(*dataset)]
+    return statistical_data
  
-def getPredictions(summaries, testSet):
+
+def get_statistical_data_by_class(tf_data, user_likes):
+    statistical_data = dict()
+    group_tf_data = group_tf_data_by_class(tf_data, user_likes)
+    #print("group_tf_data: ", group_tf_data)
+
+    for class_value, tf_value in group_tf_data.items():
+        statistical_data[class_value] = get_statistical_data(tf_value)
+
+    return statistical_data
+
+
+def predict_likes(class_statistical_data, input_data):
+    probabilities = get_class_probabilities(class_statistical_data, input_data)
+    print("probabilities :", probabilities) 
+
+    if probabilities[0] > probabilities[1]:
+        class_type = 0
+    else:
+        class_type = 1
+
+    return class_type
+
+ 
+def get_predictions(class_statistical_data, test_data):
     predictions = []
-    for i in range(len(testSet)):
-        result = predict(summaries, testSet[i])
+
+    for test_likes in range(len(test_data)):
+        result = predict_likes(class_statistical_data, test_data[test_likes])
         predictions.append(result)
+
     return predictions
  
-def getAccuracy(testSet, predictions):
-    correct = 0
-    for i in range(len(testSet)):
-        if testSet[i][-1] == predictions[i]:
-            correct += 1
-    return (correct / float(len(testSet))) * 100.0
+
+def get_accuracy(test_likes, predictions):
+    correct_predictions_count = 0
+
+    for index in range(len(test_likes)):
+        if test_likes[index] == predictions[index]:
+            correct_predictions_count += 1
+
+    accuracy = correct_predictions_count / float(len(test_likes))
+
+    return accuracy * 100.0
 
 
 if __name__ == "__main__":
