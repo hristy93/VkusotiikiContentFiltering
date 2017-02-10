@@ -22,6 +22,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="create_likes_file.py" />
     <Compile Include="VkusotiikiContentFiltering.py" />
   </ItemGroup>
   <PropertyGroup>

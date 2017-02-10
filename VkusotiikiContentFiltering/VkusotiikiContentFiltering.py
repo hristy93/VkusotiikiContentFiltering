@@ -21,6 +21,7 @@ from scipy.spatial.distance import pdist
 import matplotlib.pyplot as plt
 #from sklearn import datasets, preprocessing
 #from k_nearest_neighbours import *
+from create_likes_file import *
 import random
 
 
@@ -690,27 +691,37 @@ def print_accuracy_with_test_data(predicted_values, test_values, user_likes):
     print("incorrect: ", incorrect)
     print("incorrect_likes: ", [user_likes[index] for index in incorrect])
 
-""" Gets the user input for the type of likes (random wih some propability or some group of food) """
+""" Gets the user input for the type of likes (random wih some propability, from some user or from some group of food) """
 def get_user_input():
-    use_radom_likes = input("Use random likes with some propability: (y) or (n) \n")
-    if use_radom_likes == "y":
+    use_random_likes = False
+    use_user_likes = False
+    user_likes_type = int(input("Use random likes (1), user likes (2), food group likes (3) \n"))
+    if user_likes_type == 1:
+        use_random_likes = True
         propability_of_one = input("The propability of like for a recipe is (in 0.## format): \n")
-        return float(propability_of_one)
-    elif use_radom_likes == "n":
+        user_input = float(propability_of_one)
+    elif user_likes_type == 2:
+        use_user_likes = True
+        user_like_index = input("Choose index of the user likes: \n")
+        user_input = int(user_like_index)
+    elif user_likes_type == 3:
         food_group = input("Like a group of recipes with: meat (1), fish (2) or vegetarian products (3) \n")
-        return int(food_group)
+        user_input = int(food_group)
     else:
         raise ValueError("Not correct input!")
+    return use_user_likes, use_random_likes, user_input
 
 
 def prepare_data():
     # defines some variables and constants
     json_file_name = "recipes_500_refined_edited.json"
+    user_likes_file_name = "recipes.csv"
     propability_of_one = 0.8
     users_count = 20
     best_user_pref_count = 5
     best_recipe_count = 5
     use_random_likes = False
+    use_user_likes = False
     use_user_input = True
 
     meat_food = { "кайма", "телешк", "овч", "агнешк", "свинск", "суджук", "филе", "заеш", "месо", "кайма", "кренвирш", "кюфте", "говежд", "скарид", "овнешк", "пиле", "пуйка", "патешк", "надениц", "пушен", "роле", "шпек", "колбас", "еленск", "шунка", "гъши", "гъск", "бекон", "агнешк", "кървавиц", "салам", "пастърма" };
@@ -744,8 +755,16 @@ def prepare_data():
 
     # processes the user input
     if use_user_input:
-        user_input = get_user_input()
-        if isinstance(user_input, int):
+        use_user_likes, use_random_likes, user_input = get_user_input()
+        if use_user_likes:
+            user_like_index = user_input - 1
+            user_likes_from_file = read_user_likes_data(user_likes_file_name)
+            user_likes_from_file_count = len(user_likes_from_file)
+            print("user_likes_from_file count: ", len(user_likes_from_file))
+            if user_likes_from_file_count <= user_like_index:
+                raise ValueError("Not correct input!")
+            fav_recipe_ids = [index for index, item in enumerate(user_likes_from_file[user_like_index]) if item == 1]
+        elif not use_random_likes:
             if user_input == 1:
                 fav_recipe_ids = fav_meat_recipe_ids
                 print("You chose to like meat food\n")
@@ -759,8 +778,6 @@ def prepare_data():
                 raise ValueError("The input is not correct!")
         else:
             propability_of_one = user_input
-            use_random_likes = True
-
     else:
         if use_random_likes:
             print("The user will use random likes with {} propability of like for a recipe".format(propability_of_one))
@@ -814,6 +831,9 @@ def prepare_data():
 
         # split the tf_data and user_likes into training and testing data
         #tf_data_train, tf_data_test, likes_train, likes_test = train_test_split(tf_data, user_likes)
+    #else:
+    #    liked_recipe_ids = [index for index, item in enumerate(user_likes) if item == 1]
+    #    recipe_ids_train, recipe_ids_test = train_test_split(liked_recipe_ids)
 
     return {
         'data': data,
@@ -828,6 +848,7 @@ def prepare_data():
         'recipe_ids_test': recipe_ids_test,
         'best_recipe_count': best_recipe_count,
         'recipe_ids_train': recipe_ids_train,
+        'fav_recipe_ids' : fav_recipe_ids
     }
 
 
