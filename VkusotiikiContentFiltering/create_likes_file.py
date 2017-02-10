@@ -21,7 +21,7 @@ def create_file():
     worksheet.write_row(0, 0, range(len(recipes_names)), bold)
     worksheet.write_row(1, 0, recipes_names, bold)
 
-    for i in range(10):
+    for i in range(100):
         worksheet.write_row(i + 2, 0, [0] * len(recipes_names))
 
     workbook.close()
