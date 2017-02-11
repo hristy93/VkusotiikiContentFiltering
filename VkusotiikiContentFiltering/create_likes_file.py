@@ -1,9 +1,10 @@
+import csv
 import xlsxwriter
 
-from VkusotiikiContentFiltering import prepare_data, get_recipes_names
+#from VkusotiikiContentFiltering import prepare_data, get_recipes_names
 
 
-def create_file():
+def create_user_likes_file():
     """Create file with recipes ids, recipes titles and default values for likes."""
     data = prepare_data().get('data')
     print()
@@ -29,5 +30,17 @@ def create_file():
 
     print('File created!')
 
+
+def read_user_likes_data(filename):
+    with open(filename, 'r') as data_doc:
+        d = csv.reader(data_doc, delimiter=',')
+        res = []
+        for index, item in enumerate(d):
+            if not all(map(lambda x: x == '0', item)) and index > 1:
+                res.append(tuple(map(int, item)))
+        return res
+
+
 if __name__ == '__main__':
     create_file()
+    read_data('recipes.csv')
