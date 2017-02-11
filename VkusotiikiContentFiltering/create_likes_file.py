@@ -1,7 +1,7 @@
 import csv
 import xlsxwriter
 
-from VkusotiikiContentFiltering import prepare_data, get_recipes_names
+#from VkusotiikiContentFiltering import prepare_data, get_recipes_names
 
 
 def create_user_likes_file():

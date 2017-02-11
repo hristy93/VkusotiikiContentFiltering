@@ -5,13 +5,15 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>96149f4c-ee3f-491a-936a-5275d7479f62</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>VkusotiikiContentFiltering.py</StartupFile>
+    <StartupFile>
+    </StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>VkusotiikiContentFiltering</Name>
     <RootNamespace>VkusotiikiContentFiltering</RootNamespace>
+    <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
