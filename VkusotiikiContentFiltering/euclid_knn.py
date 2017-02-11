@@ -63,7 +63,6 @@ def generate_queue(item, trainers_ids, tf_data, k, user_likes):
 
 
 def main():
-    count = 0
 
     set_length = input('Enter traning + test sets length. Default value is {}. Your value: '.format(100))
     set_length = int(set_length if set_length else 100)
@@ -78,36 +77,44 @@ def main():
     user_likes = fetched_data.get('user_likes')
     fav_recipe_ids = fetched_data.get('fav_recipe_ids')
 
-    train_recipe_ids, test_recipe_ids = train_test_split(sample(range(len(data)), set_length))
-
-    print('\n\nkNN with k = {}\n'.format(k))
-    
-    print('Total number of recipes to train and test {}'.format(set_length))
-    
-    print('Count of recipes in TRAIN set {}. Num of liked recipes from TRAIN set: {}'.format(
-        len(train_recipe_ids),
-        len([i for i in train_recipe_ids if user_likes[i]])))
-     
-    print('Count of recipes in TEST set {}. Num liked recipes from TEST set: {}'.format(
-        len(test_recipe_ids),
-        len([i for i in test_recipe_ids if user_likes[i]])))
-
-    print()
-
+    # cross validation
     accuracy = 0
-    for recipe_id in test_recipe_ids:
-        item = tf_data[recipe_id]
+    for i in range(10):
+        count = 0
+        train_recipe_ids, test_recipe_ids = train_test_split(sample(range(len(data)), set_length))
 
-        found_class = generate_queue(item, train_recipe_ids, tf_data, k, user_likes)
+        print('\n\nkNN with k = {}\n'.format(k))
+        
+        print('Total number of recipes to train and test {}'.format(set_length))
+        
+        print('Count of recipes in TRAIN set {}. Num of liked recipes from TRAIN set: {}'.format(
+            len(train_recipe_ids),
+            len([i for i in train_recipe_ids if user_likes[i]])))
+         
+        print('Count of recipes in TEST set {}. Num liked recipes from TEST set: {}'.format(
+            len(test_recipe_ids),
+            len([i for i in test_recipe_ids if user_likes[i]])))
 
-        count = count + 1 if found_class == user_likes[recipe_id] else count
+        print()
 
-        if found_class == user_likes[recipe_id] and found_class:
-            print('Found match with id = {} called: {}'.format(
-                recipe_id, data[recipe_id].get('name')))
+        for recipe_id in test_recipe_ids:
+            item = tf_data[recipe_id]
 
-    print('Accuracy: {0:.2f}%'.format((100 * count) / len(test_recipe_ids)))
+            found_class = generate_queue(item, train_recipe_ids, tf_data, k, user_likes)
 
+            count = count + 1 if found_class == user_likes[recipe_id] else count
+
+            if found_class == user_likes[recipe_id] and found_class:
+                print('Found match with id = {} called: {}'.format(
+                    recipe_id, data[recipe_id].get('name')))
+
+        ac = (100 * count) / len(test_recipe_ids)
+        print('Accuracy: {0:.2f}%'.format(ac))
+        
+        accuracy += ac
+     
+    print('Total Accuracy: {0:.2f}%'.format((accuracy) / 10))
+    
 
 if __name__ == '__main__':
     main()
