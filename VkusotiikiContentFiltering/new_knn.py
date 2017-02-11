@@ -34,8 +34,6 @@ def generate_queue(item, trainers_ids, tf_data, k, user_likes):
 
     for trainer_id in trainers_ids:
         recipe = tf_data[trainer_id]
-        #print(recipe)
-        #print(trainer_id)
         
         # calculate scalar product of the two recipes
         current_score = numpy.dot(item, recipe)
@@ -48,11 +46,8 @@ def generate_queue(item, trainers_ids, tf_data, k, user_likes):
     # Get the largest values
     new_elements = nlargest(k, queue)
     #print(new_elements)
-    # return new_elements
         
     most_spread_class = group_classes(new_elements, user_likes)
-    # *****************************************************************
-    #print(most_spread_class)
 
     if len(set(most_spread_class.values())) == len(set(most_spread_class.keys())):
         found_class = sorted(list(most_spread_class.items()), key=lambda x: x[1])[-1][0]
@@ -88,21 +83,14 @@ def main():
     accuracy = 0
     for recipe_id in test_recipe_ids:
         item = tf_data[recipe_id]
-        #print('CHOSEN', list(zip(get_recipes_names_by_id(data, [recipe_id]), [recipe_id])))
 
         found_class = generate_queue(item, train_recipe_ids, tf_data, k, user_likes)
-        #ids = [i[1] for i in found_recipes_ids]
-        #print(list(zip(get_recipes_names_by_id(data, ids), ids)))
 
-        #match_count = len([i[1] for i in found_recipes_ids if user_likes[i[1]]])
         count = count + 1 if found_class == user_likes[recipe_id] else count
+
         if found_class == user_likes[recipe_id] and found_class:
             print('Found match with id = {} called: {}'.format(
                 recipe_id, data[recipe_id].get('name')))
-
-        #accuracy += match_count / k
-        #print('Currency accuracy', accuracy, recipe_id, found_recipes_ids, match_count)
-        #print('************************************************************************\n')
 
     print('Accuracy: {0:.2f}%'.format((100 * count) / len(test_recipe_ids)))
 
