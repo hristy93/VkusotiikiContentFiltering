@@ -850,7 +850,10 @@ def prepare_data():
         'recipe_ids_test': recipe_ids_test,
         'best_recipe_count': best_recipe_count,
         'recipe_ids_train': recipe_ids_train,
-        'fav_recipe_ids' : fav_recipe_ids
+        'tfidf_data': tfidf_data,
+        'ingredient_data': ingredient_data,
+        'fav_meat_recipe_ids': fav_meat_recipe_ids,
+        'fav_recipe_ids' : fav_recipe_ids,
     }
 
 
