@@ -3,9 +3,10 @@ import numpy
 from heapq import heappush, heappop, nlargest
 from random import sample, choice
 from time import time
+from sklearn.model_selection import train_test_split
 
 from kd_tree import kdtree, Tree
-from VkusotiikiContentFiltering import prepare_data
+from VkusotiikiContentFiltering import prepare_data, test_with_k_fold_cross_validation
 
 
 LEFT_IDX = 1
@@ -13,9 +14,12 @@ RIGHT_IDX = 2
 
 
 def group_classes(queue, user_likes):
+    r = []
     bucket, pref = {}, {}
     for score, recipe_info in queue:
         recipe, index = recipe_info
+        if index in user_likes:
+            r.append(index)
         like = user_likes[index]
         if like in bucket:
             bucket[like] += 1
@@ -23,6 +27,7 @@ def group_classes(queue, user_likes):
         else:
             bucket[like] = 1
             pref[like] = [(score, recipe_info)]
+    print('Should like', r)
     return bucket, pref
 
 
@@ -50,6 +55,7 @@ def generate_queue(item, tf_data, depth=1000):
     subtree = Tree(**tree._asdict())
     k = 0
 
+    # build k-d tree
     for level, attr in enumerate(item):
         if subtree and not all(map(lambda x: x is None, subtree)):
             idx = LEFT_IDX if subtree[0] is not None and attr < subtree[0][level] else RIGHT_IDX
@@ -65,23 +71,29 @@ def generate_queue(item, tf_data, depth=1000):
     return neighbours, neighbours_indexes
 
 
-def kNN(k, item, neighbours, indexes, user_likes):
+def kNN(k, item, neighbours, indexes, user_likes, data):
+    print('LIKES:', [i for i in neighbours if i in user_likes])
     queue = []
+    print('Fill in neighbours:')
     for neighbour, indx in zip(neighbours, indexes):
         dist = numpy.dot(item, neighbour)
         if dist:
+            print(dist, data[indx].get('name'))
             heappush(queue, (dist, (neighbour, indx)))
 
-    # queue.sort()
+    queue.sort()
     # queue = queue[:k]
 
     # We calculate cos between vectors, so bigger cos => closer recipes
     queue = nlargest(k, queue)
+    # --------------------------------------------------------------
 
     most_spread_class, pref = group_classes(queue, user_likes)
     print(most_spread_class)
-    # print('PREF', pref)
-    return [recipe_info for recipe_info in pref.get(1, [])]
+
+    # return pref.get(1, [])
+    # return pref.values()
+    return pref
 
     if len(set(most_spread_class.values())) == 1:
         found_class = sorted(list(most_spread_class.items()), key=lambda x: x[1])[-1][0]
@@ -95,21 +107,34 @@ def kNN(k, item, neighbours, indexes, user_likes):
 
 def main():
     count = 0
-    k = int(input('Enter k = '))
-    dataset = read_data('data.csv')
-    test_data = sample(dataset, 20)
-    trainers = set(dataset).difference(set(test_data))
-    for item in test_data:
-        item = list(item)
-        cl = item.pop()
-        found_class = generate_queue(item, trainers, k)
-        count = count + 1 if cl == found_class else count
-        print(item, found_class, cl == found_class)
-    print('Accuracy: {}%'.format(100 * count / len(test_data)))
+    # k = int(input('Enter k = '))
+    k = 3
+
+    fetched_data = prepare_data()
+    data = fetched_data.get('data')
+    tf_data = fetched_data.get('tf_data')
+    user_likes = fetched_data.get('user_likes')
+    
+    train_recipe_ids, test_recipe_ids = train_test_split(user_likes)
+    cl = True
+
+    for item_id in test_recipe_ids:
+        print('Test with', item_id, data[item_id].get('name'))
+        item = tf_data[item_id]
+        
+        queue, indexes = generate_queue(item, tf_data, depth=2)
+        result = kNN(k, item, queue, indexes, user_likes, data)
+        
+        count = count + 1 if cl in result else count
+        print(item_id, cl in result)
+        
+        
+        break
+        
+    print('Accuracy: {}%'.format(100 * count / len(test_recipe_ids)))
 
 
 def recipes_main():
-    # load data
     fetched_data = prepare_data()
     data = fetched_data.get('data')
     # ingredients = fetched_data.get('ingredients')
@@ -127,26 +152,38 @@ def recipes_main():
     # ingredient_data = fetched_data.get('ingredient_data')
 
     fav_meat_recipe_ids = fetched_data.get('fav_meat_recipe_ids')
+    
+    # for i, r_id in enumerate(user_likes):
+    #     if r_id:
+    #         print('rec_id', i, data[i].get('name'))
 
-    item_id = 354
+
+    # test_with_k_fold_cross_validation(fav_recipe_ids, k_fold_count)
+    item_id = 56
     k = 3
 
     item = tf_data.pop(item_id)
     print('\nChosen recipe id', item_id, data[item_id].get('name'))
 
     count = 0
-    for i in range(10):
+    for i in range(1):
         queue, indexes = generate_queue(item, tf_data, depth=2)
         print('Q', len(queue))
-        result = kNN(k, item, queue, indexes, user_likes)
-        print('\nMost preferable recipes are:')
-        for recipe_info in result:
-            print(recipe_info[0], data[recipe_info[1][1]].get('name'))
-            if recipe_info[1][1] in fav_meat_recipe_ids:
-                count += 1
+        result = kNN(k, item, queue, indexes, user_likes, data)
 
-    print('\nFinal Accuracy:', count / 10 * k)
+        print('\nMost preferable recipes are:')
+
+        for like, i in result.items():
+            print('like', like)
+            for recipe_info in i:
+                print('is liked', recipe_info[1][1] in user_likes)
+                print(recipe_info[0], data[recipe_info[1][1]].get('name'))
+                if recipe_info[1][1] in fav_meat_recipe_ids:
+                    count += 1
+
+    print('\nFinal Accuracy:', count / (1 * k))
 
 
 if __name__ == '__main__':
-    recipes_main()
+    main()
+
