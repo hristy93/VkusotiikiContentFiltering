@@ -5,19 +5,22 @@ from pprint import pformat
 
 class Tree(namedtuple('Tree', 'root left_child right_child')):
     def __repr__(self):
-        return str(tuple(self))
+        return pformat(tuple(self))
 
 
 def kdtree(point_list, depth=0):
-    try:
-        k = len(point_list[0])  # assumes all points have the same dimension
-    except IndexError as e:  # if not point_list:
-        return None
-    # Select axis based on depth so that axis cycles through all valid values
-    axis = depth % k
 
-    # Sort point list and choose median as pivot element
-    point_list.sort(key=itemgetter(axis))
+    if not len(point_list):
+        return None
+
+    k = len(point_list[0])
+
+    # Select attribute based on depth
+    attr = depth % k
+
+    # Sort point list and choose median as tree root
+    point_list.sort(key=itemgetter(attr))
+
     median = len(point_list) // 2  # choose median
 
     # Create tree and construct subtrees
