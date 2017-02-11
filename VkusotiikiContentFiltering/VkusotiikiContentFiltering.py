@@ -28,15 +28,12 @@ import random
 """
 Instructions:
  - for first use - install (in this order) numpy, scipy, sklearn
-
 Algorithm:
  - Tf-idf with binary data + VSM (Vector Space Model)
-
 Testing:
  - kNN
  - kMeans
  - Naive Bayes
-
 Functionalities:
  - finding the closest recipes to a given recipe by index
  - finding the best prefered recipes by user likes
@@ -850,7 +847,10 @@ def prepare_data():
         'recipe_ids_test': recipe_ids_test,
         'best_recipe_count': best_recipe_count,
         'recipe_ids_train': recipe_ids_train,
-        'fav_recipe_ids' : fav_recipe_ids
+        'tfidf_data': tfidf_data,
+        'ingredient_data': ingredient_data,
+        'fav_meat_recipe_ids': fav_meat_recipe_ids,
+        'fav_recipe_ids' : fav_recipe_ids,
     }
 
 
@@ -934,10 +934,12 @@ def main():
         print("\nInitiating {}-fold cross-valdation: ".format(k_fold_count))
         n_largest_user_pref_accuracies = []
         n_closest_recipes_to_best_recipe_pref_accuracies = []
-        for recipe_ids_train, recipe_ids_test in kf.split(fav_recipe_ids):
+        for fav_ids_train, fav_ids_test in kf.split(fav_recipe_ids):
             print("\nIteration {}: ".format(k_fold_index))
             k_fold_index += 1
             recipe_ids_train, recipe_ids_test = train_test_split(fav_recipe_ids)
+            #recipe_ids_train = list(map(lambda x: fav_recipe_ids[x], fav_ids_train))
+            #recipe_ids_test = list(map(lambda x: fav_recipe_ids[x], fav_ids_test))
             user_likes = generate_user_likes_by_recipes_ids(data_count, recipe_ids_train)
 
             n_largest_user_pref_accuracy, n_closest_recipes_to_best_recipe_pref_accuracy = tfidf_and_vsm_predictions(use_random_likes, best_user_pref_count, best_recipe_count, user_likes, tf_data, idf_data, data, data_count, ingredients_count, recipe_ids_test)
