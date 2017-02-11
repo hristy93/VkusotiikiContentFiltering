@@ -22007,33 +22007,51 @@
 		"dish": 1,
 		"region": 1
 	}, {
-		"name": "Бързи и вкусни бухтички",
-		"description": "Включете котлона и сложете подходящ съд с два-три пръстта олио оставете да загрее. През това време в купа разбивате яйцето, добавяте млякото, в което е угасена содата, солта, захарта и брашното. Разбърквате хубаво и с помощта на лъжица загребвате от сместа и пускате да се пържи. Изваждате готовите бухтички и ги поръсвате с пудра захар, канела, топинг по ваш вкус. ",
-		"duration": "15 мин.",
+		"name": "Кюфтенца от риба",
+		"description": "Нарежете рибата на ситни парченца. Добавете накиснатия хляб и всички останали продукти. Оформете кюфтета. Оваляйте в галета и пържете в горещо олио. По 4 минути от всяка страна. Сервирайте със сварени картофи. Можете да използвате филе и от друга риба. ",
+		"duration": "20 мин.",
 		"ingredients": [{
-				"name": "сол",
-				"quantity": "1",
-				"unit": "ч.л.",
-				"unstructured_data": "1 ч.л. сол",
-				"is_allergic": false
-			}, {
-				"name": "захар",
-				"quantity": "1",
-				"unit": "с.л.",
-				"unstructured_data": "1 с.л. захар",
-				"is_allergic": false
-			}, {
-				"name": "сода бикарбонат",
-				"quantity": "1",
-				"unit": "к.л.",
-				"unstructured_data": "1 к.л. сода бикарбонат",
-				"is_allergic": false
-			}, {
-				"name": "краве кисело мляко",
-				"quantity": "200",
+				"name": "сьомга",
+				"quantity": "400",
 				"unit": "гр.",
-				"unstructured_data": "200 гр. краве кисело мляко",
+				"unstructured_data": "400 гр. сьомга",
 				"is_allergic": true
+			}, {
+				"name": "хляб",
+				"quantity": "2",
+				"unit": "фил.",
+				"unstructured_data": "2 фил. хляб",
+				"is_allergic": false
+			}, {
+				"name": "лук кромид пресен",
+				"quantity": "3",
+				"unit": "стр.",
+				"unstructured_data": "3 стр. лук кромид пресен",
+				"is_allergic": false
+			}, {
+				"name": "мащерка",
+				"quantity": "4",
+				"unit": "стр.",
+				"unstructured_data": "4 стр. мащерка",
+				"is_allergic": false
+			}, {
+				"name": "магданоз",
+				"quantity": "4",
+				"unit": "стр.",
+				"unstructured_data": "4 стр. магданоз",
+				"is_allergic": false
+			}, {
+				"name": "сол",
+				"quantity": "4",
+				"unit": "щипка",
+				"unstructured_data": "4 щипка сол",
+				"is_allergic": false
+			}, {
+				"name": "черен пипер",
+				"quantity": "3",
+				"unit": "щипка",
+				"unstructured_data": "3 щипка черен пипер",
+				"is_allergic": false
 			}, {
 				"name": "яйца",
 				"quantity": "1",
@@ -22041,22 +22059,22 @@
 				"unstructured_data": "1 бр. яйца",
 				"is_allergic": true
 			}, {
-				"name": "брашно тип 500",
-				"quantity": "300",
-				"unit": "гр.",
-				"unstructured_data": "300 гр. брашно тип 500",
-				"is_allergic": true
+				"name": "галета",
+				"quantity": "4",
+				"unit": "с.л.",
+				"unstructured_data": "4 с.л. галета",
+				"is_allergic": false
 			}, {
 				"name": "олио",
-				"quantity": "300",
+				"quantity": "80",
 				"unit": "мл",
-				"unstructured_data": "300 мл олио",
+				"unstructured_data": "80 мл олио",
 				"is_allergic": false
 			}
 		],
-		"difficulty": 2,
-		"servings": 6,
-		"user": "bc6e69b9-6162-4e69-8028-900abfb9030e",
+		"difficulty": 4,
+		"servings": 4,
+		"user": "fffae408-45a8-42e0-a361-2c5c0735645f",
 		"category": 1,
 		"dish": 1,
 		"region": 1
@@ -25127,74 +25145,80 @@
 		"dish": 1,
 		"region": 1
 	}, {
-		"name": "Салата \"Шопска вариация\"",
-		"description": "Всички продукти се нарязват по обичайния начин. За основа първо в чинията слагате нараязаната маруля, и върху нея редите обелените домати, нарязани на кубчета, краставиците не ги беля, защото са домашни и съвсем пресни корнишони. Добавят се зелена чушка, кромид, нарязан на шайбички, сирене на кубчета, маслини. Поливаме обилно със зехтин и поръсваме с кашкавал. Украсяваме с варени яйца, пресен босилек и стрък мента. ",
-		"duration": "15 мин.",
+		"name": "Яхния с пилешко",
+		"description": "В загрятото олио сложете нарязания на филийки лук, пушена наденица и пилешки гърди, подправете със сол и черен пипер. Леко запържете, докато побелее пилешкото месо. След това сложете нарязаните на ивици гъби. Добавете разтвореното доматено пюре в 1 чаша вода и оставете ястието да поври, докато сосът се сгъсти. Гарнитура: Запържете ориза съвсем леко в зехтина и маслото. Налейте 500 мл. топла вода и оставете на слаб огън бавно да ври, докато попие водата. Сервирайте ястието, гарнирано с ориза. ",
+		"duration": "40 мин.",
 		"ingredients": [{
-				"name": "яйца",
+				"name": "зехтин",
 				"quantity": "2",
-				"unit": "бр.",
-				"unstructured_data": "2 бр. яйца",
+				"unit": "с.л.",
+				"unstructured_data": "2 с.л. зехтин",
+				"is_allergic": false
+			}, {
+				"name": "масло",
+				"quantity": "1",
+				"unit": "с.л.",
+				"unstructured_data": "1 с.л. масло",
 				"is_allergic": true
 			}, {
-				"name": "кашкавал",
-				"quantity": "50",
+				"name": "ориз",
+				"quantity": "125",
 				"unit": "гр.",
-				"unstructured_data": "50 гр. кашкавал",
-				"is_allergic": true
-			}, {
-				"name": "мента",
-				"quantity": "1",
-				"unit": "стр.",
-				"unstructured_data": "1 стр. мента",
+				"unstructured_data": "125 гр. ориз",
 				"is_allergic": false
 			}, {
-				"name": "босилек",
-				"quantity": "1",
-				"unit": "стр.",
-				"unstructured_data": "1 стр. босилек",
-				"is_allergic": false
-			}, {
-				"name": "сирене овче",
-				"quantity": "100",
+				"name": "гъби",
+				"quantity": "200",
 				"unit": "гр.",
-				"unstructured_data": "100 гр. сирене овче",
-				"is_allergic": true
-			}, {
-				"name": "зелени чушки",
-				"quantity": "1",
-				"unit": "бр.",
-				"unstructured_data": "1 бр. зелени чушки",
+				"unstructured_data": "200 гр. гъби",
 				"is_allergic": false
 			}, {
-				"name": "лук кромид стар",
-				"quantity": "1",
-				"unit": "бр.",
-				"unstructured_data": "1 бр. лук кромид стар",
+				"name": "черен пипер",
+				"quantity": "4",
+				"unit": "щипка",
+				"unstructured_data": "4 щипка черен пипер",
 				"is_allergic": false
 			}, {
-				"name": "домати",
+				"name": "сол",
+				"quantity": "4",
+				"unit": "щипка",
+				"unstructured_data": "4 щипка сол",
+				"is_allergic": false
+			}, {
+				"name": "доматено пюре",
+				"quantity": "2",
+				"unit": "с.л.",
+				"unstructured_data": "2 с.л. доматено пюре",
+				"is_allergic": false
+			}, {
+				"name": "олио",
+				"quantity": "2",
+				"unit": "с.л.",
+				"unstructured_data": "2 с.л. олио",
+				"is_allergic": false
+			}, {
+				"name": "лук кромид стар ",
+				"quantity": "2",
+				"unit": "гл.",
+				"unstructured_data": "2 гл. лук кромид стар",
+				"is_allergic": false
+			}, {
+				"name": "пилешки гърди",
 				"quantity": "2",
 				"unit": "бр.",
-				"unstructured_data": "2 бр. домати",
+				"unstructured_data": "2 бр. пилешки гърди",
 				"is_allergic": false
 			}, {
-				"name": "краставици",
-				"quantity": "2",
-				"unit": "бр.",
-				"unstructured_data": "2 бр. краставици",
-				"is_allergic": false
-			}, {
-				"name": "маруля",
+				"name": "наденица",
 				"quantity": "1",
 				"unit": "бр.",
-				"unstructured_data": "1 бр. маруля",
+				"unstructured_data": "1 бр. наденица",
 				"is_allergic": false
 			}
 		],
 		"difficulty": 4,
 		"servings": 4,
-		"user": "bc6e69b9-6162-4e69-8028-900abfb9030e",
+		"user": "170f7163-6da9-4536-b8d6-cf588abc8c1e",
 		"category": 1,
 		"dish": 1,
 		"region": 1

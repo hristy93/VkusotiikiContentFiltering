@@ -16,6 +16,7 @@ def main():
     fav_recipe_ids = fetched_data.get('fav_recipe_ids')
     data_count = fetched_data.get('data_count')
 
+    fix_tf_data(tf_data)
     test_with_k_fold_cross_validation(fav_recipe_ids, 10, tf_data, user_likes, data_count)
 
     #train_tf_data, test_tf_data, train_likes, test_likes = train_test_split(tf_data, user_likes)
@@ -34,6 +35,13 @@ def main():
     #print("predictions: ", predictions, len(predictions))
     #print('accuracy: {}'.format(accuracy))
 
+def fix_tf_data(tf_data):
+    epsilon = 0.00001
+    for tf_value_index, tf_value in enumerate(tf_data):
+        for item_index, item in enumerate(tf_value):
+            if item == 0:
+                tf_data[tf_value_index][item_index] += epsilon
+
 def naive_bayes(train_tf_data, test_tf_data, train_likes, test_likes):
     class_statistical_data = get_statistical_data_by_class(train_tf_data, train_likes)
     predictions = get_predictions(class_statistical_data, test_tf_data)
@@ -42,8 +50,8 @@ def naive_bayes(train_tf_data, test_tf_data, train_likes, test_likes):
     return accuracy
     #print('accuracy: {}'.format(accuracy))
 
+
 def test_with_k_fold_cross_validation(fav_recipe_ids, k_fold_count, tf_data, user_likes, data_count):
-    # add the parameters of your function
     kf = KFold(n_splits=k_fold_count)
     k_fold_index = 0
     print("\n Initiating {}-fold cross-valdation: ".format(k_fold_count))
@@ -127,9 +135,16 @@ def get_statistical_data_by_class(tf_data, user_likes):
 def predict_likes(class_statistical_data, input_data):
     probabilities = get_class_probabilities(class_statistical_data, input_data)
     #print("probabilities: ", probabilities) 
-    propability_of_zero = math.log(probabilities[0])
-    propability_of_one = math.log(probabilities[1])
-    #print("new propabilites: {0} {1}".format(propability_of_zero, propability_of_one))
+    bottom_limit = -math.pow(1, 50)
+    if probabilities[0] == math.inf or probabilities[1] < -bottom_limit:
+        return 0
+    elif probabilities[1] == math.inf or probabilities[0] < -bottom_limit:
+        return 1
+    
+    else:
+        propability_of_zero = math.log(probabilities[0])
+        propability_of_one = math.log(probabilities[1])
+        print("new propabilites: {0} {1}".format(propability_of_zero, propability_of_one))
 
     if propability_of_zero > propability_of_one:
         class_type = 0
