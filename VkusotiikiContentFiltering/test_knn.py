@@ -52,7 +52,7 @@ def generate_queue(item, trainers_ids, tf_data, k, user_likes):
         
     most_spread_class = group_classes(new_elements, user_likes)
     # *****************************************************************
-    print(most_spread_class)
+    #print(most_spread_class)
 
     if len(set(most_spread_class.values())) == len(set(most_spread_class.keys())):
         found_class = sorted(list(most_spread_class.items()), key=lambda x: x[1])[-1][0]
@@ -61,14 +61,16 @@ def generate_queue(item, trainers_ids, tf_data, k, user_likes):
         classes = [item for item, cl in most_spread_class.items() if cl == k]
         closest_cl = heappop(new_elements)
         found_class = closest_cl if closest_cl in classes else choice(classes)
-    print(found_class)
+
     return found_class
 
 
 def main():
     count = 0
+    set_length = 80
+
     # k = int(input('Enter k = '))
-    k = 5
+    k = int(sqrt(set_length))
 
     fetched_data = prepare_data()
     data = fetched_data.get('data')
@@ -76,17 +78,17 @@ def main():
     user_likes = fetched_data.get('user_likes')
     fav_recipe_ids = fetched_data.get('fav_recipe_ids')
 
-    train_recipe_ids, test_recipe_ids = train_test_split(sample(range(len(data)), 100))
+    train_recipe_ids, test_recipe_ids = train_test_split(sample(range(len(data)), set_length))
     print('\n\nkNN\n')
-    print('Liked:', len([i for i in train_recipe_ids if user_likes[i]]))
-    print('SHould be liked', len([i for i in test_recipe_ids if user_likes[i]]))
+    print('Num liked recipes from TRAIN set:', len([i for i in train_recipe_ids if user_likes[i]]))
+    print('Num liked recipes from TEST set', len([i for i in test_recipe_ids if user_likes[i]]))
 
     print()
 
     accuracy = 0
     for recipe_id in test_recipe_ids:
         item = tf_data[recipe_id]
-        print('CHOSEN', list(zip(get_recipes_names_by_id(data, [recipe_id]), [recipe_id])))
+        #print('CHOSEN', list(zip(get_recipes_names_by_id(data, [recipe_id]), [recipe_id])))
 
         found_class = generate_queue(item, train_recipe_ids, tf_data, k, user_likes)
         #ids = [i[1] for i in found_recipes_ids]
@@ -95,11 +97,12 @@ def main():
         #match_count = len([i[1] for i in found_recipes_ids if user_likes[i[1]]])
         count = count + 1 if found_class == user_likes[recipe_id] else count
         if found_class == user_likes[recipe_id] and found_class:
-            print('Found match', recipe_id, data[recipe_id].get('name'))
+            print('Found match with id = {} called: {}'.format(
+                recipe_id, data[recipe_id].get('name')))
 
         #accuracy += match_count / k
         #print('Currency accuracy', accuracy, recipe_id, found_recipes_ids, match_count)
-        print('************************************************************************\n')
+        #print('************************************************************************\n')
 
     print('Accuracy: {0:.2f}%'.format((100 * count) / len(test_recipe_ids)))
 
