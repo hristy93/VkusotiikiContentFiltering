@@ -28,15 +28,12 @@ import random
 """
 Instructions:
  - for first use - install (in this order) numpy, scipy, sklearn
-
 Algorithm:
  - Tf-idf with binary data + VSM (Vector Space Model)
-
 Testing:
  - kNN
  - kMeans
  - Naive Bayes
-
 Functionalities:
  - finding the closest recipes to a given recipe by index
  - finding the best prefered recipes by user likes
