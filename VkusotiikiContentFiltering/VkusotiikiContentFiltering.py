@@ -53,6 +53,7 @@ def enable_win_unicode_console():
 """ Reads the json data and saves it in data """
 def read_json(json_file_name):
     data = []
+    #print("Reading recipe data ...\n")
     with open(json_file_name, 'r', encoding="utf-8") as json_data:
         data = json.load(json_data)
     return data
@@ -65,7 +66,7 @@ def generate_user_likes(data_count, binary_propabilities):
     #    user_likes.append(random.randint(0, 1))
     #return user_likes
     user_likes = np.random.choice([0, 1], size=(data_count,), p=binary_propabilities)
-    print("user_likes count:", len(user_likes))
+    print("user likes count:", len(user_likes))
     print("{} recipes liked from {}".format(sum(user_likes), data_count))
     return user_likes
 
@@ -77,8 +78,8 @@ def generate_user_likes_by_recipes_ids(data_count, fav_recipe_ids):
     for recipe_id in fav_recipe_ids:
         user_likes[recipe_id] = 1
 
-    print("user_likes count:", len(user_likes))
-    print("{} recipes liked from {}".format(sum(user_likes), data_count))
+    #print("user likes count:", len(user_likes))
+    #print("{} recipes liked from {}".format(sum(user_likes), data_count))
     return user_likes
 
 
@@ -97,7 +98,7 @@ def get_tf_data(ingredient_data, data):
                 #tf_inner_data.append(math.log(tf_value) + 1) # new way
                 tf_inner_data.append(tf_value)
         tf_data.append(tf_inner_data)
-    print("tf_data count: ", str(len(tf_data)))
+    print("tf data count: ", str(len(tf_data)))
     return tf_data
 
 
@@ -112,7 +113,7 @@ def get_idf_data(ingredients_count_info, data_count):
             #idf_data.append(math.log((data_count) / (item + 1))) # old way
             #idf_data.append(math.log(max_count) / (item + 1)) # new way
             idf_data.append(math.log((data_count) / (item + 1)))
-    print("idf_data count: ", str(len(idf_data)))
+    print("idf data count: ", str(len(idf_data)))
     return idf_data
 
 
@@ -133,7 +134,7 @@ def get_ingredients(data):
         for ingredient in item['ingredients']:
             if ingredient['name'] != '':
                 ingredients.add(ingredient['name']) 
-    print("ingredients count: ", str(len(ingredients)))
+    #print("ingredients count: ", str(len(ingredients)))
     return ingredients
 
 
@@ -144,7 +145,7 @@ def process_data(data, ingredients, ingredient_data, ingredients_count_info, mea
     index = 0
     ingredient_inner_data_counter = 0
     ingredients_count_info_counter = 0
-    print("Processing recipes data ...")
+    print("\nProcessing recipes data ...")
     #start_time = time.perf_counter()
     for recipe in data:
         #if index == 30:
@@ -217,8 +218,9 @@ def process_data(data, ingredients, ingredient_data, ingredients_count_info, mea
 
     #end_time = time.perf_counter()
     #print("Recipes data processed for {} seconds".format(time.strftime("%H.%M.%S", time.gmtime(time.time() - start_time))))
-    print("ingredient_data count: ", str(len(ingredient_data.values())))
-    print("ingredients_count_info count: ", str(len(ingredients_count_info)))
+
+    #print("ingredient_data count: ", str(len(ingredient_data.values())))
+    #print("ingredients_count_info count: ", str(len(ingredients_count_info)))
 
 
     # the old implementation of the process_data function
@@ -275,7 +277,7 @@ def generate_user_profile(tf_data, ingredients_count, user_likes):
         #print(str(len(tf_list)))
         user_profile_value = np.dot(user_likes, tf_list)
         user_profile.append(user_profile_value)
-    print("user_profile count: ", str(len(user_profile)))
+    #print("user_profile count: ", str(len(user_profile)))
     return user_profile
 
 
@@ -295,14 +297,13 @@ def generate_user_pref(data_count, tf_data, idf_data, user_profile):
 
 """ Gets the n largest user preferences """
 def get_n_largest_user_pref(best_user_pref_count, best_recipe_pref_index, user_pref, user_likes):
-    # how to add them in the user_pref sorted - heap ?
     max_user_pref = user_pref[best_recipe_pref_index]
     modified_user_pref = {index : float("{0:.2f}".format(round(item / max_user_pref, 2))) for index, item in enumerate(user_pref) if user_likes[user_pref.index(item)] == 0}
     n_largest_user_pref_indexes = nlargest(best_user_pref_count, modified_user_pref, key=modified_user_pref.get)
     n_largest_user_pref = {index : modified_user_pref[index] for index in n_largest_user_pref_indexes}
-    print("The {} largest user pref for the unliked recipes for a user:".format(best_user_pref_count))
-    print("n_largest_user_pref_indexes: ", str(n_largest_user_pref_indexes))
-    print("n_largest_user_pref: ", n_largest_user_pref)
+    print("The {} most likely recipes to be favored by the user using TF-IDF:".format(best_user_pref_count))
+    #print("n_largest_user_pref_indexes: ", str(n_largest_user_pref_indexes))
+    #print("n_largest_user_pref: ", n_largest_user_pref)
     return (n_largest_user_pref_indexes, n_largest_user_pref)
 
 
@@ -329,9 +330,10 @@ def n_closest_recipes_to_best_recipe_pref(best_recipe_count, tf_data, user_likes
     n_closest_recipe_indexes = nlargest(best_recipe_count, recipe_diff_modified, key=recipe_diff_modified.get)
     n_closest_recipes = {index : recipes_diff[index] for index in n_closest_recipe_indexes}
     #print("recipes_diff: " + str(recipes_diff))
-    print("The closest recipes to the recipe with the largest user pref using VSM (Vector Space Model):")
-    print("n_closest_recipes: ", str(n_closest_recipes))
-    print("n_closest_recipe_indexes: ", str(n_closest_recipe_indexes))
+    print("The {} closest recipes to the most favored recipe by the user: ".format(best_recipe_count) +
+          "using VSM (Vector Space Model): ")
+    #print("n_closest_recipes: ", str(n_closest_recipes))
+    #print("n_closest_recipe_indexes: ", str(n_closest_recipe_indexes))
     return n_closest_recipes, n_closest_recipe_indexes
 
 
@@ -603,8 +605,8 @@ def find_closest_ingredients(ingredients):
 """ Finds ingredients that contain some words """
 def find_meaty_ingredients(ingredients, meat_food, fish_food):
     meaty_ingredients = dict()
-    print("meat_food count: " + str(len(meat_food)))
-    print("fish_food count: " + str(len(fish_food)))
+    #print("meat_food count: " + str(len(meat_food)))
+    #print("fish_food count: " + str(len(fish_food)))
 
     for item in ingredients:
         for meat in meat_food:
@@ -630,8 +632,8 @@ def find_meaty_ingredients(ingredients, meat_food, fish_food):
 """ Adds the meaty food as ingredients """
 def add_food_groups_as_ingredients(meaty_ingredients, ingredients):
     ingredients.extend([key for key in meaty_ingredients.keys() if key not in ingredients])
-    print("new ingredients count: ", str(len(ingredients)))
-    print("meaty_ingredients count: ", str(len(meaty_ingredients)))
+    #print("new ingredients count: ", str(len(ingredients)))
+    #print("meaty_ingredients count: ", str(len(meaty_ingredients)))
 
 
 """ Tests the tf-idf transformer onto the ingredients data """     
@@ -683,15 +685,16 @@ def get_accuracy_with_test_data(predicted_values, test_values, user_likes):
     #str(sum([1 for index in predicted_values if index in test_values]) /
           #predicted_values_count))
     accuracy = float("{0:.2f}".format(round(len(correct) / predicted_values_count, 2)))
-    print("accuracy with test data: ", accuracy)
-    print("correct: ", correct)
-    print("correct_likes: ", [user_likes[index] for index in correct])
-    print("incorrect: ", incorrect)
-    print("incorrect_likes: ", [user_likes[index] for index in incorrect])
+    #print("accuracy with test data: ", accuracy)
+    #print("correct: ", correct)
+    #print("correct_likes: ", [user_likes[index] for index in correct])
+    #print("incorrect: ", incorrect)
+    #print("incorrect_likes: ", [user_likes[index] for index in incorrect])
     return accuracy
 
 """ Gets the user input for the type of likes (random wih some propability, from some user or from some group of food) """
 def get_user_input():
+    print("User input: ")
     use_random_likes = False
     use_user_likes = False
     user_likes_type = int(input("Use random likes (1), user likes (2), food group likes (3) \n"))
@@ -704,7 +707,7 @@ def get_user_input():
         user_like_index = input("Choose index of the user likes: \n")
         user_input = int(user_like_index)
     elif user_likes_type == 3:
-        food_group = input("Like a group of recipes with: meat (1), fish (2) or vegetarian products (3) \n")
+        food_group = input("Like a group of recipes with: meat (1), fish (2) or vegetarian ingredients (3) \n")
         user_input = int(food_group)
     else:
         raise ValueError("Not correct input!")
@@ -715,8 +718,8 @@ def prepare_data():
     # defines some variables and constants
     json_file_name = "recipes_500_refined_edited.json"
     user_likes_file_name = "recipes.csv"
-    propability_of_one = 0.8
-    users_count = 20
+    propability_of_one = 0.6
+    #users_count = 20
     best_user_pref_count = 5
     best_recipe_count = 5
     use_random_likes = False
@@ -739,7 +742,6 @@ def prepare_data():
 
     # defines more variables
     data_count = len(data)
-    print("data count: " + str(data_count))
     ingredient_data = dict()
     ingredients_count_info = dict()
     ingredients = set()
@@ -759,7 +761,7 @@ def prepare_data():
             user_like_index = user_input - 1
             user_likes_from_file = read_user_likes_data(user_likes_file_name)
             user_likes_from_file_count = len(user_likes_from_file)
-            print("user_likes_from_file count: ", len(user_likes_from_file))
+            #print("user_likes_from_file count: ", len(user_likes_from_file))
             if user_likes_from_file_count <= user_like_index:
                 raise ValueError("Not correct input!")
             fav_recipe_ids = [index for index, item in enumerate(user_likes_from_file[user_like_index]) if item == 1]
@@ -796,6 +798,11 @@ def prepare_data():
 
     # finds the closest ingredients to eachother
     #find_closest_ingredients(ingredients)
+
+    # prints general info about the recipe data
+    print("\nRecipes data information:")
+    print("recipes count: " + str(data_count))
+    print("ingredients count: ", str(ingredients_count))
     
     # generates the tf, idf and tf-idf data
     idf_data = get_idf_data(ingredients_count_info, data_count)
@@ -834,6 +841,10 @@ def prepare_data():
     #    liked_recipe_ids = [index for index, item in enumerate(user_likes) if item == 1]
     #    recipe_ids_train, recipe_ids_test = train_test_split(liked_recipe_ids)
 
+    # prints general info about the recipe data
+    print("user likes count:", len(user_likes))
+    print("{} recipes liked from {}".format(sum(user_likes), data_count))
+
     return {
         'data': data,
         'ingredients': ingredients,
@@ -857,6 +868,7 @@ def prepare_data():
 def get_recipes_names(data):
     return [recipe.get('name') for recipe in data]
 
+
 def tfidf_and_vsm_predictions(use_random_likes, best_user_pref_count, best_recipe_count, user_likes,
                               tf_data, idf_data, data, data_count, ingredients_count, recipe_ids_test):
     # creates the user profile and his/her recipe preference and gets the most suitable recipe
@@ -866,8 +878,7 @@ def tfidf_and_vsm_predictions(use_random_likes, best_user_pref_count, best_recip
     best_recipe_pref_index = user_pref.index(best_user_pref)
 
     # prints the best recipe for the user
-    print("\n")
-    print("best recipe for user: ")
+    print("\nThe most favored recipe by the user: ")
     print_recipes_info(data, best_recipe_pref_index)
     print("\n")
 
@@ -884,29 +895,39 @@ def tfidf_and_vsm_predictions(use_random_likes, best_user_pref_count, best_recip
     print_recipes_info(data, n_closest_recipe_indexes, n_closest_recipes)
     if not use_random_likes:
         n_closest_recipes_to_best_recipe_pref_accuracy = get_accuracy_with_test_data(n_closest_recipe_indexes,
-                                                                                     recipe_ids_test, user_likes)
-    return n_largest_user_pref_accuracy, n_closest_recipes_to_best_recipe_pref_accuracy
+                                                                                recipe_ids_test, user_likes)
+    if not use_random_likes:   
+        return n_largest_user_pref_accuracy, n_closest_recipes_to_best_recipe_pref_accuracy
+
 
 def test_with_k_fold_cross_validation(fav_recipe_ids, k_fold_count):
     # add the parameters of your function
     kf = KFold(n_splits=k_fold_count)
     k_fold_index = 0
-    print("\n Initiating {}-fold cross-valdation: ".format(k_fold_count))
+    print("\nInitiating {}-fold cross-valdation: ".format(k_fold_count))
     accuracies = []
-    for recipe_ids_train, recipe_ids_test in kf.split(fav_recipe_ids):
-        print("\n Iteration {}: ".format(k_fold_index))
+
+    for fav_ids_train, fav_ids_test in kf.split(fav_recipe_ids):
+        print("\nIteration {}: ".format(k_fold_index))
         k_fold_index += 1
 
-        recipe_ids_train, recipe_ids_test = train_test_split(fav_recipe_ids)
+        recipe_ids_train = list(map(lambda x: fav_recipe_ids[x], fav_ids_train))
+        recipe_ids_test = list(map(lambda x: fav_recipe_ids[x], fav_ids_test))
+
+        # other type of validation
+        #recipe_ids_train, recipe_ids_test = train_test_split(fav_recipe_ids)
+
         user_likes = generate_user_likes_by_recipes_ids(data_count, recipe_ids_train)
 
         # call your function and return accuracy using the function get_accuracy_with_test_data(...)
         #accuracy = ...
 
-        print("\n Accuracy: ", accuracy)
+        print("\nAccuracy: ", accuracy)
         accuracies.append(accuracy)
         average_accuracy =  np.mean(accuracies)
-    print("\n Average accuracy: ", average_accuracy)
+
+    print("\nAverage accuracy: ", average_accuracy)
+
 
 def main():
     fetched_data = prepare_data()
@@ -928,29 +949,30 @@ def main():
         tfidf_and_vsm_predictions(use_random_likes, best_user_pref_count, best_recipe_count, user_likes,
                                   tf_data, idf_data, data, data_count, ingredients_count, recipe_ids_test)
     else:
-        k_fold_count = 10
-        kf = KFold(n_splits=k_fold_count)
-        k_fold_index = 0
-        print("\nInitiating {}-fold cross-valdation: ".format(k_fold_count))
+        validation_count = 10
+        print("\nInitiating validation: ".format(validation_count))
         n_largest_user_pref_accuracies = []
         n_closest_recipes_to_best_recipe_pref_accuracies = []
-        for fav_ids_train, fav_ids_test in kf.split(fav_recipe_ids):
-            print("\nIteration {}: ".format(k_fold_index))
-            k_fold_index += 1
+        for validation_index in range(validation_count):
+            print("\n#######")
+            print("Iteration {}: ".format(validation_index + 1))
             recipe_ids_train, recipe_ids_test = train_test_split(fav_recipe_ids)
-            #recipe_ids_train = list(map(lambda x: fav_recipe_ids[x], fav_ids_train))
-            #recipe_ids_test = list(map(lambda x: fav_recipe_ids[x], fav_ids_test))
             user_likes = generate_user_likes_by_recipes_ids(data_count, recipe_ids_train)
 
             n_largest_user_pref_accuracy, n_closest_recipes_to_best_recipe_pref_accuracy = tfidf_and_vsm_predictions(use_random_likes, best_user_pref_count, best_recipe_count, user_likes, tf_data, idf_data, data, data_count, ingredients_count, recipe_ids_test)
 
-            print("\nn_largest_user_pref_accuracy: ", n_largest_user_pref_accuracy)
-            print("n_closest_recipes_to_best_recipe_pref_accuracy: ", n_closest_recipes_to_best_recipe_pref_accuracy)
+            print("\nAccuracy (tf-idf): {0:.00f}%".format(n_largest_user_pref_accuracy * 100))
+            print("Accuracy (VSM): {0:.00f}%".format(n_closest_recipes_to_best_recipe_pref_accuracy * 100))
 
             n_largest_user_pref_accuracies.append(n_largest_user_pref_accuracy)
             n_closest_recipes_to_best_recipe_pref_accuracies.append(n_closest_recipes_to_best_recipe_pref_accuracy)
-        print("\nn_largest_user_pref_accuracies average: ", np.mean(n_largest_user_pref_accuracies))
-        print("n_closest_recipes_to_best_recipe_pref_accuracies average: ", np.mean(n_closest_recipes_to_best_recipe_pref_accuracies))
+
+            print("#######\n")
+
+        print("Average accuracies from {} iterations:".format(validation_count))
+        print("Average accuracy (tf-idf): {0:.00f}%".format(np.mean(n_largest_user_pref_accuracies) * 100))
+        print("Average accuracy (VSM): {0:.00f}%".format(np.mean(n_closest_recipes_to_best_recipe_pref_accuracies) * 100))
+       
 
     # creates the user profile and his/her recipe preference and gets the most suitable recipe
     #user_profile = generate_user_profile(tf_data, ingredients_count, user_likes)
