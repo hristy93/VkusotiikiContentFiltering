@@ -19,22 +19,6 @@ def main():
     fix_tf_data(tf_data)
     test_with_k_fold_cross_validation(fav_recipe_ids, 10, tf_data, user_likes, data_count)
 
-    #train_tf_data, test_tf_data, train_likes, test_likes = train_test_split(tf_data, user_likes)
-    ##test_tf_data = [tf_data[item] for item in recipe_ids_test]
-    ##train_tf_data = [tf_data[item] for item in recipe_ids_train]
-
-    #class_statistical_data = get_statistical_data_by_class(train_tf_data, train_likes)
-
-    ##print("train_tf_data: ", train_tf_data)
-    #print("train_likes: ", train_likes)
-    ##print("test_tf_data: ", test_tf_data)
-    #print("test_likes: ", test_likes)
-
-    #predictions = get_predictions(class_statistical_data, test_tf_data)
-    #accuracy = get_accuracy(test_likes, predictions)
-    #print("predictions: ", predictions, len(predictions))
-    #print('accuracy: {}'.format(accuracy))
-
 def fix_tf_data(tf_data):
     epsilon = 0.00001
     for tf_value_index, tf_value in enumerate(tf_data):
@@ -46,9 +30,7 @@ def naive_bayes(train_tf_data, test_tf_data, train_likes, test_likes):
     class_statistical_data = get_statistical_data_by_class(train_tf_data, train_likes)
     predictions = get_predictions(class_statistical_data, test_tf_data)
     accuracy = get_accuracy(test_likes, predictions)
-    print("predictions: ", predictions, len(predictions))
     return accuracy
-    #print('accuracy: {}'.format(accuracy))
 
 
 def test_with_k_fold_cross_validation(fav_recipe_ids, k_fold_count, tf_data, user_likes, data_count):
@@ -70,7 +52,7 @@ def test_with_k_fold_cross_validation(fav_recipe_ids, k_fold_count, tf_data, use
 
         print("\n Accuracy: ", accuracy)
         accuracies.append(accuracy)
-        average_accuracy =  np.mean(accuracies)
+        average_accuracy = np.mean(accuracies)
     print("\n Average accuracy: ", average_accuracy)
 
 def group_tf_data_by_class(tf_data, user_likes):
@@ -79,8 +61,8 @@ def group_tf_data_by_class(tf_data, user_likes):
     grouped_tf_data[1] = list()
 
     for tf_index, tf_value in enumerate(tf_data):
-        tf_value_like = user_likes[tf_index]
-        grouped_tf_data[tf_value_like].append(tf_value)
+        class_type = user_likes[tf_index]
+        grouped_tf_data[class_type].append(tf_value)
 
     return grouped_tf_data
 
@@ -90,7 +72,6 @@ def standard_deviation(tf_values):
     variance = sum([pow(x - avg,2) for x in tf_values])/float(len(tf_values)-1)
     deviation = math.sqrt(variance)
     return deviation
- 
 
 def get_attribute_probability(input_value, mean, standard_deviation):
     if standard_deviation != 0:
@@ -119,12 +100,10 @@ def get_class_probabilities(class_statistical_data, input_data):
 def get_statistical_data(dataset):
     statistical_data = [(np.mean(attribute), standard_deviation(attribute)) for attribute in zip(*dataset)]
     return statistical_data
- 
 
 def get_statistical_data_by_class(tf_data, user_likes):
     statistical_data = dict()
     group_tf_data = group_tf_data_by_class(tf_data, user_likes)
-    #print("group_tf_data: ", group_tf_data)
 
     for class_value, tf_value in group_tf_data.items():
         statistical_data[class_value] = get_statistical_data(tf_value)
@@ -135,16 +114,14 @@ def get_statistical_data_by_class(tf_data, user_likes):
 def predict_likes(class_statistical_data, input_data):
     probabilities = get_class_probabilities(class_statistical_data, input_data)
     #print("probabilities: ", probabilities) 
-    bottom_limit = -math.pow(1, 50)
-    if probabilities[0] == math.inf or probabilities[1] < -bottom_limit:
+    bottom_limit = math.pow(1, -50)
+    if probabilities[0] == math.inf or probabilities[1] < bottom_limit:
         return 0
-    elif probabilities[1] == math.inf or probabilities[0] < -bottom_limit:
+    elif probabilities[1] == math.inf or probabilities[0] < bottom_limit:
         return 1
-    
     else:
         propability_of_zero = math.log(probabilities[0])
         propability_of_one = math.log(probabilities[1])
-        print("new propabilites: {0} {1}".format(propability_of_zero, propability_of_one))
 
     if propability_of_zero > propability_of_one:
         class_type = 0
@@ -152,7 +129,6 @@ def predict_likes(class_statistical_data, input_data):
         class_type = 1
 
     return class_type
-
  
 def get_predictions(class_statistical_data, test_data):
     predictions = []
@@ -162,7 +138,6 @@ def get_predictions(class_statistical_data, test_data):
         predictions.append(result)
 
     return predictions
- 
 
 def get_accuracy(test_likes, predictions):
     correct_predictions_count = 0
