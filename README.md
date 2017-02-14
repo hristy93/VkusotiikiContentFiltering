@@ -1,15 +1,22 @@
-# Vkusotiiki-bg AI
+# Content-based Filtering Recommendation System for Vkusotiiki-bg
 
-The project implements the following algorithms in Python 3.5:
+## Description
+Me and my teammates implemented some machine learning algorithms that are used as Content-based Filtering Recommendation System for our previous project called [Vkusotiiki-bg](https://github.com/kakato10/vkusotiiki-bg)
 
- - kNN with kd tree
+## Machine learning algorithms
+The project implements the following machine learning algorithms in Python 3.5:
+
+ - kNN (k Nearest Neighbours) with:
+   - KD-Tree
+   - Cosine similarity
+   - Euclidean distance
 
  - Naive Bayes
 
- - kMeans
+ - k-Means
 
- - TF-IDF
-
+ - TF-IDF + Vector Space Model (Cosine similarity)
+ 
 
 #### Installation details:
  - Install packages from requirements.txt in virtualenv
