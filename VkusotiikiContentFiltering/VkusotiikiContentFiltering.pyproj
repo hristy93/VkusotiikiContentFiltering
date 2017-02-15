@@ -23,7 +23,13 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="cos_knn.py" />
     <Compile Include="create_likes_file.py" />
+    <Compile Include="euclid_knn.py" />
+    <Compile Include="kd_tree.py" />
+    <Compile Include="kd_tree_kNN.py" />
+    <Compile Include="k_means_content_filtering.py" />
+    <Compile Include="naive_bayes.py" />
     <Compile Include="VkusotiikiContentFiltering.py" />
   </ItemGroup>
   <PropertyGroup>
